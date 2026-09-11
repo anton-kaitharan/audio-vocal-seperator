@@ -1,23 +1,32 @@
 import os
+import sys
 import re
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 
-load_dotenv(r"F:\ANTONY BACKUP\ASUS VIVO BACKP\New Volume\YouTubeTools\py.env")
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+    except Exception:
+        pass
+
+BASE = os.path.dirname(os.path.abspath(__file__))
+for env_file in ["py.env", ".env"]:
+    env_path = os.path.join(BASE, env_file)
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
 
 # ===================== CONFIG =====================
 BOT_TOKEN  = os.getenv("BOT_TOKEN_ENV")
-ALLOWED_ID = int(os.getenv("ALLOWED_ID_ENV"))  # must be int
-BASE       = r"F:\ANTONY BACKUP\ASUS VIVO BACKP\New Volume\YouTubeTools"
+raw_id     = os.getenv("ALLOWED_ID_ENV")
+ALLOWED_ID = int(raw_id) if raw_id and raw_id.strip().lstrip("-").isdigit() else None
 QUEUE      = os.path.join(BASE, "queue")
 PROCESSING = os.path.join(BASE, "processing")
 DONE       = os.path.join(BASE, "done")
 OUTPUT     = os.path.join(BASE, "output")
 # ==================================================
-
-print(f"Bot token loaded : {'YES' if BOT_TOKEN else 'NO - check py.env'}")
-print(f"Allowed ID       : {ALLOWED_ID}")
 
 def clean_url(url):
     match = re.search(r"(https?://(?:www\.)?youtube\.com/watch\?v=[^&]+)", url)
@@ -50,7 +59,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/start - show this help"
     )
 
-# /list — shows currently processing + waiting separately
+# /list - shows currently processing + waiting separately
 async def list_jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ALLOWED_ID:
         await update.message.reply_text("Unauthorized.")
@@ -61,23 +70,23 @@ async def list_jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     msg = ""
     if processing:
-        msg += "Processing now:\n" + "\n".join(f"  • {f}" for f in processing) + "\n\n"
+        msg += "Processing now:\n" + "\n".join(f"  * {f}" for f in processing) + "\n\n"
     if waiting:
-        msg += "Waiting:\n" + "\n".join(f"  • {f}" for f in waiting)
+        msg += "Waiting:\n" + "\n".join(f"  * {f}" for f in waiting)
 
     await update.message.reply_text(msg if msg else "Queue is empty.")
 
-# /done — completed jobs
+# /done - completed jobs
 async def done_jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ALLOWED_ID:
         await update.message.reply_text("Unauthorized.")
         return
     files = [f for f in os.listdir(DONE) if f.endswith(".txt")]
     await update.message.reply_text(
-        "Completed:\n" + "\n".join(f"  • {f}" for f in files) if files else "No completed jobs yet."
+        "Completed:\n" + "\n".join(f"  * {f}" for f in files) if files else "No completed jobs yet."
     )
 
-# /files — list output folder with file sizes
+# /files - list output folder with file sizes
 async def list_files(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ALLOWED_ID:
         await update.message.reply_text("Unauthorized.")
@@ -95,7 +104,7 @@ async def list_files(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("Output files:\n" + "\n".join(lines))
 
-# Handle messages — create job file
+# Handle messages - create job file
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ALLOWED_ID:
         await update.message.reply_text("Unauthorized.")
@@ -146,9 +155,25 @@ if __name__ == "__main__":
     for folder in [QUEUE, PROCESSING, DONE, OUTPUT]:
         os.makedirs(folder, exist_ok=True)
 
-    print("Bot starting...")
-    print(f"Queue: {QUEUE}")
+    print("=" * 45)
+    print("      YouTube Karoke Telegram Bot")
+    print("=" * 45)
+    print(f"Base Directory   : {BASE}")
+    print(f"Queue Directory  : {QUEUE}")
+    print(f"Bot Token Loaded : {'YES' if BOT_TOKEN else 'NO - check py.env or .env'}")
+    print(f"Allowed User ID  : {ALLOWED_ID if ALLOWED_ID else 'NOT SET - check py.env or .env'}")
+    print("=" * 45)
 
+    if not BOT_TOKEN or not ALLOWED_ID:
+        print("\n[CONFIGURATION REQUIRED FOR TELEGRAM BOT]")
+        print("To use the Telegram bot:")
+        print("1. Copy 'py.env.example' to 'py.env' (or '.env')")
+        print("2. Set BOT_TOKEN_ENV to your Telegram bot token from @BotFather")
+        print("3. Set ALLOWED_ID_ENV to your Telegram user ID from @userinfobot")
+        print("\nAlternatively, run 'run.bat' for direct interactive usage without Telegram.")
+        exit(1)
+
+    print("Bot starting...")
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("list", list_jobs))

@@ -1,6 +1,10 @@
-yt-dlp==2025.3.31
+yt-dlp>=2025.1.1
 demucs
 torch
 torchaudio
+numpy<2
 requests
 python-telegram-bot
+python-dotenv
+fastapi
+uvicorn

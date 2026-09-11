@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuraVocal &mdash; YouTube Karaoke & Vocal Separator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- TOP HEADER -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+          </svg>
+          <span class="pulse-ring"></span>
+        </div>
+        <div class="brand-text">
+          <h1>Aura<span>Vocal</span></h1>
+          <p class="tagline">AI Vocal Separation Studio</p>
+        </div>
+      </div>
+
+      <div class="header-telemetry">
+        <div class="telemetry-pill" id="gpu-pill" title="Hardware Acceleration Status">
+          <span class="status-dot green"></span>
+          <span class="pill-label">GPU:</span>
+          <span class="pill-value" id="gpu-value">Checking...</span>
+        </div>
+
+        <div class="telemetry-pill" id="watcher-pill">
+          <span class="status-dot" id="watcher-dot"></span>
+          <span class="pill-label">Watcher:</span>
+          <span class="pill-value" id="watcher-status">Checking...</span>
+          <button class="icon-btn tiny" id="btn-toggle-watcher" title="Toggle background watcher service">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+        </div>
+
+        <button class="glass-btn btn-secondary" id="btn-open-terminal" title="View Real-time Logs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+          <span>Terminal Logs</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="main-grid">
+      <!-- LEFT: CREATE NEW SEPARATION JOB -->
+      <section class="panel glass-card creator-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <div class="icon-circle violet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+              </svg>
+            </div>
+            <div>
+              <h2>Create Karaoke Track</h2>
+              <p class="subtitle">Extract instrumental audio from any YouTube track</p>
+            </div>
+          </div>
+        </div>
+
+        <form id="job-form" class="creator-form">
+          <!-- YouTube URL Input -->
+          <div class="form-group">
+            <label for="input-url">
+              YouTube Video URL <span class="required">*</span>
+            </label>
+            <div class="input-with-action">
+              <input
+                type="url"
+                id="input-url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                required
+                autocomplete="off"
+              />
+              <button type="button" id="btn-fetch-meta" class="inside-btn" title="Auto-detect title from YouTube">
+                <span id="fetch-text">Fetch Info</span>
+                <span class="spinner hidden" id="fetch-spinner"></span>
+              </button>
+            </div>
+            <div class="input-hint" id="url-hint">Supports standard, shortened (youtu.be), and music links</div>
+          </div>
+
+          <!-- Song Title -->
+          <div class="form-group">
+            <label for="input-title">
+              Track Name / Output Title <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="input-title"
+              placeholder="e.g. Bohemian Rhapsody"
+              required
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- Trim Controls -->
+          <div class="form-group">
+            <div class="label-with-badge">
+              <label>Audio Trimming</label>
+              <span class="badge-optional">Optional</span>
+            </div>
+            <div class="trim-inputs-row">
+              <div class="trim-field">
+                <span class="trim-prefix">Start</span>
+                <input type="text" id="input-start" placeholder="00:00:00" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" />
+              </div>
+              <div class="trim-divider">&rarr;</div>
+              <div class="trim-field">
+                <span class="trim-prefix">End</span>
+                <input type="text" id="input-end" placeholder="00:03:30" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" />
+              </div>
+            </div>
+            <div class="input-hint">Format: hh:mm:ss. Leave empty to extract the full song.</div>
+          </div>
+
+          <!-- Quality / Model Badge -->
+          <div class="preset-info-banner">
+            <div class="banner-item">
+              <span class="banner-label">AI Engine</span>
+              <span class="banner-val">Demucs htdemucs</span>
+            </div>
+            <div class="banner-item">
+              <span class="banner-label">Output Spec</span>
+              <span class="banner-val">44.1kHz Stereo PCM WAV</span>
+            </div>
+            <div class="banner-item">
+              <span class="banner-label">Audio Stems</span>
+              <span class="banner-val">Vocals Removed</span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="btn-submit-job" class="glow-submit-btn">
+            <span class="btn-glow"></span>
+            <span class="btn-content">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>Separate & Generate Karaoke</span>
+            </span>
+          </button>
+        </form>
+      </section>
+
+      <!-- RIGHT: JOBS & OUTPUT LIBRARY -->
+      <section class="panel glass-card library-panel">
+        <div class="tabs-header">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="tab-active">
+              <span>Active & Queue</span>
+              <span class="count-bubble" id="badge-active-count">0</span>
+            </button>
+            <button class="tab-btn" data-tab="tab-completed">
+              <span>Karaoke Library</span>
+              <span class="count-bubble" id="badge-library-count">0</span>
+            </button>
+          </div>
+
+          <button class="icon-btn" id="btn-refresh-data" title="Refresh queue and files">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- TAB: ACTIVE & QUEUE -->
+        <div class="tab-content active" id="tab-active">
+          <!-- Processing Section -->
+          <div class="queue-subgroup">
+            <div class="subgroup-title">
+              <span class="pulsing-radar"></span>
+              <h3>Currently Processing</h3>
+            </div>
+            <div class="job-list" id="list-processing">
+              <div class="empty-state">
+                <p>No jobs currently separating. Add a YouTube URL to begin.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Waiting Queue Section -->
+          <div class="queue-subgroup">
+            <div class="subgroup-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+              <h3>Waiting in Queue</h3>
+            </div>
+            <div class="job-list" id="list-queue">
+              <div class="empty-state">
+                <p>Queue is clear.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: COMPLETED LIBRARY -->
+        <div class="tab-content" id="tab-completed">
+          <div class="file-list" id="list-completed">
+            <div class="empty-state">
+              <p>No separated audio tracks yet. Completed tracks will be stored here.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FLOATING AUDIO PLAYER DOCK -->
+    <div class="player-dock glass-card" id="audio-dock">
+      <div class="player-track-info">
+        <div class="track-artwork">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+        <div class="track-details">
+          <div class="track-title" id="player-title">Select a track to play</div>
+          <div class="track-status" id="player-status">44.1kHz Stereo PCM WAV</div>
+        </div>
+      </div>
+
+      <div class="player-controls-wrap">
+        <div class="player-buttons">
+          <button class="player-btn icon-btn" id="btn-seek-back" title="Rewind 10s">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 19 2 12 11 5 11 19"></polygon>
+              <polygon points="22 19 13 12 22 5 22 19"></polygon>
+            </svg>
+          </button>
+
+          <button class="player-btn play-pause-btn" id="btn-play-pause" title="Play / Pause">
+            <svg id="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <svg id="icon-pause" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          </button>
+
+          <button class="player-btn icon-btn" id="btn-seek-fwd" title="Fast forward 10s">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 19 22 12 13 5 13 19"></polygon>
+              <polygon points="2 19 11 12 2 5 2 19"></polygon>
+            </svg>
+          </button>
+        </div>
+
+        <div class="scrub-container">
+          <span class="time-label" id="current-time">0:00</span>
+          <div class="scrub-bar-wrap">
+            <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1" />
+            <div class="scrub-progress" id="scrub-progress-fill"></div>
+          </div>
+          <span class="time-label" id="duration-time">0:00</span>
+        </div>
+      </div>
+
+      <div class="player-actions">
+        <div class="volume-control">
+          <button class="icon-btn tiny" id="btn-mute" title="Mute / Unmute">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </button>
+          <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1" />
+        </div>
+
+        <a class="icon-btn download-btn" id="player-download-link" href="#" download title="Download WAV File">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- TERMINAL / LOG DRAWER -->
+    <div class="log-drawer" id="log-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+          <span id="log-drawer-title">Real-Time Job Log</span>
+        </div>
+        <div class="drawer-actions">
+          <button class="icon-btn tiny" id="btn-clear-log" title="Clear log screen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+          <button class="icon-btn tiny" id="btn-close-log" title="Close Terminal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="terminal-body" id="terminal-body">
+        <pre id="log-content">Loading log output...</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- HIDDEN AUDIO ELEMENT -->
+  <audio id="global-audio-player" preload="metadata"></audio>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

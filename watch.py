@@ -1,15 +1,27 @@
 import os
+import sys
 import time
 import subprocess
 import re
+import shutil
 import requests
 from threading import Thread
 from queue import Queue
 from dotenv import load_dotenv
 
-load_dotenv(r"F:\ANTONY BACKUP\ASUS VIVO BACKP\New Volume\YouTubeTools\py.env")
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+    except Exception:
+        pass
 
-BASE = r"F:\ANTONY BACKUP\ASUS VIVO BACKP\New Volume\YouTubeTools"
+BASE = os.path.dirname(os.path.abspath(__file__))
+
+for env_file in ["py.env", ".env"]:
+    env_path = os.path.join(BASE, env_file)
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
 
 WATCH      = os.path.join(BASE, "queue")
 PROCESSING = os.path.join(BASE, "processing")
@@ -19,18 +31,28 @@ LOGS       = os.path.join(BASE, "logs")
 MODELS     = os.path.join(BASE, "models")
 SEPARATED  = os.path.join(BASE, "separated")
 
-# Full paths to binaries
+# Binary paths with dynamic fallback
 DEMUCS = os.path.join(BASE, "demucs_ext", "Scripts", "demucs.exe")
+if not os.path.exists(DEMUCS):
+    DEMUCS = shutil.which("demucs") or DEMUCS
+
 YTDLP  = os.path.join(BASE, "yt-dlp.exe")
+if not os.path.exists(YTDLP):
+    YTDLP = shutil.which("yt-dlp") or YTDLP
+
 FFMPEG = os.path.join(BASE, "ffmpeg", "bin", "ffmpeg.exe")
+if not os.path.exists(FFMPEG):
+    FFMPEG = shutil.which("ffmpeg") or FFMPEG
 
 # ===================== TELEGRAM CONFIG =====================
 BOT_TOKEN = os.getenv("BOT_TOKEN_ENV")
 CHAT_ID   = os.getenv("CHAT_ID_ENV")
 # ===========================================================
 
-os.environ["TORCH_HOME"]     = MODELS
-os.environ["XDG_CACHE_HOME"] = MODELS
+os.environ["TORCH_HOME"]                      = MODELS
+os.environ["XDG_CACHE_HOME"]                  = MODELS
+os.environ["HF_HOME"]                         = MODELS
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
 MAX_WORKERS = 2
 job_queue = Queue()
@@ -60,6 +82,10 @@ def tg_send_file(wav_path, title, logfile):
     wav_size_mb = os.path.getsize(wav_path) / (1024 * 1024)
     log(f"WAV size: {wav_size_mb:.1f} MB", logfile)
 
+    if not BOT_TOKEN or not CHAT_ID:
+        log("[TG SKIP] Telegram token or Chat ID not configured. Finished file preserved in output/.", logfile)
+        return
+
     mp3_path = None  # track so we can delete after sending
 
     if wav_size_mb <= 50:
@@ -69,8 +95,8 @@ def tg_send_file(wav_path, title, logfile):
     else:
         # Convert to MP3 320kbps for Telegram delivery
         mp3_path = wav_path.replace("_karoke.wav", "_karoke.mp3")
-        log(f"WAV over 50MB — converting to MP3 for Telegram...", logfile)
-        tg_send(f"{title}\nWAV is {wav_size_mb:.1f} MB — converting to MP3 for sending...\nWAV is saved in output folder.")
+        log(f"WAV over 50MB - converting to MP3 for Telegram...", logfile)
+        tg_send(f"{title}\nWAV is {wav_size_mb:.1f} MB - converting to MP3 for sending...\nWAV is saved in output folder.")
 
         subprocess.run(
             f'"{FFMPEG}" -y -i "{wav_path}" -codec:a libmp3lame -qscale:a 0 "{mp3_path}"',
@@ -100,14 +126,14 @@ def tg_send_file(wav_path, title, logfile):
             )
         if resp.ok:
             log("File sent to Telegram successfully.", logfile)
-            # Delete MP3 after successful send — WAV is kept
+            # Delete MP3 after successful send - WAV is kept
             if mp3_path and os.path.exists(mp3_path):
                 os.remove(mp3_path)
                 log(f"MP3 deleted after sending: {mp3_path}", logfile)
         else:
             log(f"[TG ERROR] sendAudio failed: {resp.text}", logfile)
             tg_send(f"Could not send file. Find it at:\noutput\\{os.path.basename(send_path)}")
-            # Don't delete MP3 if send failed — keep it as backup
+            # Don't delete MP3 if send failed - keep it as backup
     except Exception as e:
         log(f"[TG ERROR] {e}", logfile)
         tg_send(f"File send error: {e}")
@@ -237,7 +263,7 @@ def process_job(proc_path):
 
         tg_send(f"{title}\nVocals removed. Processing audio...")
 
-        # FFMPEG — force 1411kbps PCM WAV
+        # FFMPEG - force 1411kbps PCM WAV
         log("Processing audio...", logfile)
         af = (
             "silenceremove=start_periods=1:start_duration=0.5:start_threshold=-40dB,"
@@ -263,7 +289,7 @@ def process_job(proc_path):
         log(f"[OK] Saved: {output_file}", logfile)
         tg_send(f"Done processing: {title}\nSending file...")
 
-        # SEND — WAV if under 50MB, else MP3 (deleted after sending)
+        # SEND - WAV if under 50MB, else MP3 (deleted after sending)
         tg_send_file(output_file, title, logfile)
 
     except Exception as e:
@@ -311,30 +337,37 @@ def scan_folder():
         print(f"Scan error: {e}")
 
 # ---------- START ----------
-print("PRO WATCH SYSTEM STARTED")
-print(f"Queue  : {WATCH}")
-print(f"Output : {OUTPUT}")
-print(f"Models : {MODELS}")
-print(f"TG Token : {'OK' if BOT_TOKEN else 'MISSING - check py.env'}")
-print(f"TG ChatID: {CHAT_ID if CHAT_ID else 'MISSING - check py.env'}")
-print()
+if __name__ == "__main__":
+    for folder in [WATCH, PROCESSING, DONE, OUTPUT, LOGS, MODELS, SEPARATED]:
+        os.makedirs(folder, exist_ok=True)
 
-for label, path in [("demucs", DEMUCS), ("yt-dlp", YTDLP), ("ffmpeg", FFMPEG)]:
-    status = "[OK]     " if os.path.exists(path) else "[MISSING]"
-    print(f"{status} {label}: {path}")
-print()
+    print("=" * 45)
+    print("      PRO KAROKE WATCH SYSTEM STARTED")
+    print("=" * 45)
+    print(f"Queue    : {WATCH}")
+    print(f"Output   : {OUTPUT}")
+    print(f"Models   : {MODELS}")
+    print(f"TG Token : {'OK' if BOT_TOKEN else 'MISSING - check py.env or .env'}")
+    print(f"TG ChatID: {CHAT_ID if CHAT_ID else 'MISSING - check py.env or .env'}")
+    print("=" * 45)
 
-for folder in [WATCH, PROCESSING, DONE, OUTPUT, LOGS, MODELS, SEPARATED]:
-    os.makedirs(folder, exist_ok=True)
+    for label, path in [("demucs", DEMUCS), ("yt-dlp", YTDLP), ("ffmpeg", FFMPEG)]:
+        status = "[OK]     " if path and os.path.exists(path) else "[MISSING]"
+        print(f"{status} {label}: {path}")
+    print()
 
-tg_send("Karoke Watcher started and ready! ")
+    tg_send("Karoke Watcher started and ready! 🎤")
 
-threads = []
-for _ in range(MAX_WORKERS):
-    t = Thread(target=worker, daemon=True)
-    t.start()
-    threads.append(t)
+    threads = []
+    for _ in range(MAX_WORKERS):
+        t = Thread(target=worker, daemon=True)
+        t.start()
+        threads.append(t)
 
-while True:
-    scan_folder()
-    time.sleep(2)
+    print(f"Waiting for jobs in '{WATCH}'...")
+    try:
+        while True:
+            scan_folder()
+            time.sleep(2)
+    except KeyboardInterrupt:
+        print("\nStopping watcher...")

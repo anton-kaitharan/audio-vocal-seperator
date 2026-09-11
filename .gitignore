@@ -83,4 +83,5 @@ __pycache__/
 *.pyc
 
 # env files
-py.env
+py.env.env
+*.env
