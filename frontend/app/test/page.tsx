@@ -12,8 +12,6 @@ import {
   RefreshCw,
   Terminal,
   Send,
-  CheckCircle2,
-  AlertCircle,
   Clock,
   Layers,
   Sparkles,
@@ -25,7 +23,6 @@ import {
   fetchJobLog,
   toggleWatcher,
   submitSeparationJob,
-  fetchYoutubeMetadata
 } from '../../lib/api';
 import { BackendStatus } from '../../types/studio';
 
@@ -46,7 +43,6 @@ export default function TestRouterPage() {
   const [testSubmitting, setTestSubmitting] = useState(false);
   const [testResult, setTestResult] = useState<any>(null);
 
-  // Poll backend status
   const checkStatus = async () => {
     setIsLoading(true);
     const res = await fetchBackendStatus();
@@ -73,7 +69,6 @@ export default function TestRouterPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Poll logs for selected job
   useEffect(() => {
     if (!selectedJob) return;
     const loadLog = async () => {
@@ -118,8 +113,8 @@ export default function TestRouterPage() {
     <div style={{
       width: '100vw',
       minHeight: '100vh',
-      background: 'var(--bg-darkest)',
-      color: '#fff',
+      background: '#f8fafc',
+      color: 'var(--text-primary)',
       display: 'flex',
       flexDirection: 'column'
     }}>
@@ -133,10 +128,10 @@ export default function TestRouterPage() {
 
       <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
-        {/* Top Banner / Router Info */}
+        {/* Top Banner */}
         <div style={{
-          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.05))',
-          border: '1px solid rgba(139, 92, 246, 0.25)',
+          background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(2, 132, 199, 0.04))',
+          border: '1px solid rgba(124, 58, 237, 0.2)',
           borderRadius: '12px',
           padding: '20px',
           display: 'flex',
@@ -148,7 +143,9 @@ export default function TestRouterPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Activity size={20} color="var(--accent-purple)" />
-              <h1 style={{ fontSize: '18px', fontWeight: 700 }}>Interactive Test Sandbox (`/test`)</h1>
+              <h1 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                Interactive Test Sandbox (`/test`)
+              </h1>
             </div>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
               Directly verify API connectivity, trigger isolated separation jobs, inspect GPU telemetry, and view live stdout logs.
@@ -160,15 +157,16 @@ export default function TestRouterPage() {
               onClick={checkStatus}
               disabled={isLoading}
               style={{
-                background: 'var(--bg-card)',
+                background: '#ffffff',
                 border: '1px solid var(--border-light)',
                 padding: '8px 14px',
                 borderRadius: '8px',
                 fontSize: '12px',
-                color: '#fff',
+                color: 'var(--text-primary)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
               }}
             >
               <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
@@ -188,7 +186,7 @@ export default function TestRouterPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                boxShadow: '0 2px 10px var(--accent-purple-glow)'
+                boxShadow: '0 2px 8px var(--accent-purple-glow)'
               }}
             >
               <Sliders size={14} />
@@ -201,30 +199,31 @@ export default function TestRouterPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
           {/* Backend Status Card */}
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '10px',
             padding: '16px',
             display: 'flex',
             alignItems: 'center',
-            gap: '14px'
+            gap: '14px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
           }}>
             <div style={{
               width: '42px',
               height: '42px',
               borderRadius: '8px',
-              background: isConnected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+              background: isConnected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Server size={22} color={isConnected ? '#10b981' : '#ef4444'} />
+              <Server size={22} color={isConnected ? '#059669' : '#dc2626'} />
             </div>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Backend API Server
               </div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: isConnected ? '#34d399' : '#f87171', marginTop: '2px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: isConnected ? '#059669' : '#dc2626', marginTop: '2px' }}>
                 {isConnected ? 'Online (localhost:5000)' : 'Offline / Standalone'}
               </div>
             </div>
@@ -232,30 +231,31 @@ export default function TestRouterPage() {
 
           {/* GPU Hardware Card */}
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '10px',
             padding: '16px',
             display: 'flex',
             alignItems: 'center',
-            gap: '14px'
+            gap: '14px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
           }}>
             <div style={{
               width: '42px',
               height: '42px',
               borderRadius: '8px',
-              background: status?.cuda_available ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+              background: status?.cuda_available ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Cpu size={22} color={status?.cuda_available ? '#10b981' : '#f59e0b'} />
+              <Cpu size={22} color={status?.cuda_available ? '#059669' : '#d97706'} />
             </div>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 AI Acceleration
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginTop: '2px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>
                 {status?.gpu_name || (status?.cuda_available ? 'CUDA Active' : 'CPU Inference Mode')}
               </div>
             </div>
@@ -263,20 +263,21 @@ export default function TestRouterPage() {
 
           {/* Watcher Service Card */}
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '10px',
             padding: '16px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <div style={{
                 width: '42px',
                 height: '42px',
                 borderRadius: '8px',
-                background: status?.watcher_running ? 'rgba(139, 92, 246, 0.15)' : 'rgba(107, 114, 128, 0.15)',
+                background: status?.watcher_running ? 'rgba(124, 58, 237, 0.12)' : 'rgba(107, 114, 128, 0.12)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -287,7 +288,7 @@ export default function TestRouterPage() {
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Queue Watcher
                 </div>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: status?.watcher_running ? '#c084fc' : 'var(--text-muted)', marginTop: '2px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: status?.watcher_running ? 'var(--accent-purple)' : 'var(--text-muted)', marginTop: '2px' }}>
                   {status?.watcher_running ? 'Running (Active)' : 'Stopped'}
                 </div>
               </div>
@@ -297,9 +298,9 @@ export default function TestRouterPage() {
               onClick={handleToggleWatcher}
               disabled={isTogglingWatcher || !isConnected}
               style={{
-                background: status?.watcher_running ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                border: status?.watcher_running ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)',
-                color: status?.watcher_running ? '#f87171' : '#34d399',
+                background: status?.watcher_running ? '#fee2e2' : '#ecfdf5',
+                border: status?.watcher_running ? '1px solid #fca5a5' : '1px solid #a7f3d0',
+                color: status?.watcher_running ? '#dc2626' : '#059669',
                 padding: '6px 12px',
                 borderRadius: '6px',
                 fontSize: '11px',
@@ -316,59 +317,61 @@ export default function TestRouterPage() {
 
           {/* Queue Statistics Card */}
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '10px',
             padding: '16px',
             display: 'flex',
             alignItems: 'center',
-            gap: '14px'
+            gap: '14px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
           }}>
             <div style={{
               width: '42px',
               height: '42px',
               borderRadius: '8px',
-              background: 'rgba(6, 182, 212, 0.15)',
+              background: 'rgba(2, 132, 199, 0.12)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Layers size={22} color="#06b6d4" />
+              <Layers size={22} color="#0284c7" />
             </div>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Active Queue State
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                <span style={{ color: '#fff', fontWeight: 600 }}>{status?.processing_count || 0}</span> processing •{' '}
-                <span style={{ color: '#fff', fontWeight: 600 }}>{status?.queue_count || 0}</span> queued •{' '}
-                <span style={{ color: '#fff', fontWeight: 600 }}>{status?.output_count || 0}</span> outputs
+                <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{status?.processing_count || 0}</span> processing •{' '}
+                <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{status?.queue_count || 0}</span> queued •{' '}
+                <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{status?.output_count || 0}</span> outputs
               </div>
             </div>
           </div>
         </div>
 
-        {/* Main Work Area: Left Test Form, Right Live Terminal */}
+        {/* Main Work Area */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           
           {/* LEFT: SUBMIT TEST JOB */}
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '12px',
             padding: '20px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px'
+            gap: '16px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Send size={18} color="var(--accent-purple)" />
-              <h2 style={{ fontSize: '15px', fontWeight: 600 }}>Trigger Audio Separation Test</h2>
+              <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Trigger Audio Separation Test</h2>
             </div>
 
             <form onSubmit={handleRunSeparationTest} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>
                   YouTube URL
                 </label>
                 <input
@@ -378,19 +381,19 @@ export default function TestRouterPage() {
                   required
                   style={{
                     width: '100%',
-                    background: 'var(--bg-darkest)',
+                    background: '#f8fafc',
                     border: '1px solid var(--border-light)',
                     borderRadius: '6px',
                     padding: '8px 10px',
                     fontSize: '12px',
-                    color: '#fff',
+                    color: 'var(--text-primary)',
                     outline: 'none'
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>
                   Job / Track Title
                 </label>
                 <input
@@ -400,12 +403,12 @@ export default function TestRouterPage() {
                   required
                   style={{
                     width: '100%',
-                    background: 'var(--bg-darkest)',
+                    background: '#f8fafc',
                     border: '1px solid var(--border-light)',
                     borderRadius: '6px',
                     padding: '8px 10px',
                     fontSize: '12px',
-                    color: '#fff',
+                    color: 'var(--text-primary)',
                     outline: 'none'
                   }}
                 />
@@ -413,7 +416,7 @@ export default function TestRouterPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>
                     Trim Start
                   </label>
                   <input
@@ -422,19 +425,19 @@ export default function TestRouterPage() {
                     onChange={(e) => setTestStart(e.target.value)}
                     style={{
                       width: '100%',
-                      background: 'var(--bg-darkest)',
+                      background: '#f8fafc',
                       border: '1px solid var(--border-light)',
                       borderRadius: '6px',
                       padding: '7px 10px',
                       fontSize: '11px',
                       fontFamily: 'var(--font-mono)',
-                      color: '#fff',
+                      color: 'var(--text-primary)',
                       outline: 'none'
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>
                     Trim End
                   </label>
                   <input
@@ -443,13 +446,13 @@ export default function TestRouterPage() {
                     onChange={(e) => setTestEnd(e.target.value)}
                     style={{
                       width: '100%',
-                      background: 'var(--bg-darkest)',
+                      background: '#f8fafc',
                       border: '1px solid var(--border-light)',
                       borderRadius: '6px',
                       padding: '7px 10px',
                       fontSize: '11px',
                       fontFamily: 'var(--font-mono)',
-                      color: '#fff',
+                      color: 'var(--text-primary)',
                       outline: 'none'
                     }}
                   />
@@ -470,7 +473,7 @@ export default function TestRouterPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 4px 12px var(--accent-purple-glow)',
+                  boxShadow: '0 2px 8px var(--accent-purple-glow)',
                   marginTop: '6px'
                 }}
               >
@@ -481,15 +484,15 @@ export default function TestRouterPage() {
 
             {testResult && (
               <div style={{
-                background: 'var(--bg-card)',
+                background: '#f8fafc',
                 border: '1px solid var(--border-light)',
                 borderRadius: '8px',
                 padding: '12px',
                 fontSize: '12px',
                 fontFamily: 'var(--font-mono)'
               }}>
-                <div style={{ color: '#34d399', fontWeight: 600, marginBottom: '4px' }}>✓ Job Dispatched:</div>
-                <pre style={{ margin: 0, color: 'var(--text-secondary)', overflowX: 'auto' }}>
+                <div style={{ color: '#059669', fontWeight: 700, marginBottom: '4px' }}>✓ Job Dispatched:</div>
+                <pre style={{ margin: 0, color: 'var(--text-primary)', overflowX: 'auto' }}>
                   {JSON.stringify(testResult, null, 2)}
                 </pre>
               </div>
@@ -498,17 +501,18 @@ export default function TestRouterPage() {
 
           {/* RIGHT: REAL-TIME TERMINAL LOG VIEWER */}
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '12px',
             overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
           }}>
             {/* Terminal Header */}
             <div style={{
               height: '42px',
-              background: 'var(--bg-darkest)',
+              background: '#f8fafc',
               borderBottom: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
@@ -517,7 +521,7 @@ export default function TestRouterPage() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Terminal size={16} color="var(--accent-purple)" />
-                <span style={{ fontSize: '12px', fontWeight: 600 }}>Raw Backend Terminal Output</span>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>Raw Backend Terminal Output</span>
               </div>
 
               {/* Job Selector */}
@@ -526,12 +530,12 @@ export default function TestRouterPage() {
                   value={selectedJob}
                   onChange={(e) => setSelectedJob(e.target.value)}
                   style={{
-                    background: 'var(--bg-card)',
+                    background: '#ffffff',
                     border: '1px solid var(--border-light)',
                     borderRadius: '4px',
                     padding: '4px 8px',
                     fontSize: '11px',
-                    color: '#fff',
+                    color: 'var(--text-primary)',
                     outline: 'none',
                     maxWidth: '180px'
                   }}
@@ -551,11 +555,11 @@ export default function TestRouterPage() {
             <div style={{
               flex: 1,
               padding: '16px',
-              background: '#07070a',
+              background: '#0f172a',
               fontFamily: 'var(--font-mono)',
               fontSize: '11px',
               lineHeight: 1.6,
-              color: '#d1d5db',
+              color: '#f8fafc',
               overflowY: 'auto',
               maxHeight: '380px'
             }}>

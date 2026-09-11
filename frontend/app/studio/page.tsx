@@ -13,8 +13,8 @@ import { StemTrack, InspectorState } from '../../types/studio';
 
 export default function StudioPage() {
   const [projectTitle, setProjectTitle] = useState('Bohemian_Rhapsody_AI_Stems');
-  const [duration, setDuration] = useState(30); // 30s loop showcase
-  const [currentTime, setCurrentTime] = useState(14.2); // Matching the screenshot's scrub position around ~14s
+  const [duration, setDuration] = useState(30);
+  const [currentTime, setCurrentTime] = useState(14.2);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.85);
   const [activeTool, setActiveTool] = useState('select');
@@ -115,7 +115,6 @@ export default function StudioPage() {
     };
   }, [isPlaying, duration, inspector.playbackSpeed]);
 
-  // Track Actions
   const handleToggleMute = (id: string) => {
     setTracks(tracks.map(t => t.id === id ? { ...t, muted: !t.muted } : t));
   };
@@ -150,7 +149,6 @@ export default function StudioPage() {
   };
 
   const handleApplyEffect = (effectName: string) => {
-    // Modify active track waveform seed or envelope to reflect effect
     setTracks(tracks.map(t => ({ ...t, waveformSeed: t.waveformSeed + 12 })));
   };
 
@@ -162,7 +160,8 @@ export default function StudioPage() {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: 'var(--bg-darkest)',
+      background: '#ffffff',
+      color: 'var(--text-primary)',
       overflow: 'hidden'
     }}>
       {/* 1. Top Mac Titlebar */}
@@ -190,7 +189,7 @@ export default function StudioPage() {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          background: 'var(--bg-darkest)',
+          background: '#ffffff',
           overflow: 'hidden',
           position: 'relative'
         }}>
@@ -205,7 +204,8 @@ export default function StudioPage() {
           <div style={{
             flex: 1,
             overflowY: 'auto',
-            position: 'relative'
+            position: 'relative',
+            background: '#ffffff'
           }}>
             {/* Synchronized Red Playhead Scrub Line crossing all tracks */}
             <div
@@ -216,7 +216,7 @@ export default function StudioPage() {
                 bottom: 0,
                 width: '1.5px',
                 background: 'var(--playhead-red)',
-                boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)',
+                boxShadow: '0 0 6px rgba(239, 68, 68, 0.4)',
                 zIndex: 25,
                 pointerEvents: 'none'
               }}
