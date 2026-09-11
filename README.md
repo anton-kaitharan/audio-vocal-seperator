@@ -1,106 +1,12 @@
-# 🎵 YouTube Vocal Remover (Local Tool)
+# YouTube Karoke Maker
 
-Download audio from YouTube, remove vocals using Demucs, trim audio, and export clean WAV files — all locally on your PC.
-
----
-
-## 🚀 Features
-
-* 🎥 Download audio from YouTube links
-* 🎤 Remove vocals using Demucs AI
-* ✂️ Optional trimming (start & end time)
-* 🔇 Automatic silence removal (beginning & end)
-* 💾 Outputs high-quality WAV files
-* 🔁 Batch processing (multiple links one after another)
-* ⚡ Works fully offline after download (processing is local)
+Removes vocals from any YouTube video and saves a karoke WAV file.
+Uses **yt-dlp** to download, **Demucs** (htdemucs) for AI vocal separation, and **FFmpeg** for processing.
+Controlled entirely from your phone via a **Telegram bot**.
 
 ---
 
-## 🧠 How It Works
-
-1. Paste a YouTube URL
-2. Tool downloads audio (`yt-dlp`)
-3. Removes vocals (`demucs`)
-4. Cleans audio (`ffmpeg`)
-5. Saves final output:
-
-```text
-SongName_no_vocals.wav
-```
-
----
-
-## 📦 Requirements
-
-### 🔹 Python
-
-* Python **3.10 or 3.11 recommended**
-
----
-
-### 🔹 Python Packages
-
-Install:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-### 🔹 External Tools (IMPORTANT)
-
-You must install these manually:
-
----
-
-### 1. Demucs
-
-```bash
-pip install demucs
-```
-
----
-
-### 2. PyTorch (Required by Demucs)
-
-CPU version:
-
-```bash
-pip install torch torchaudio
-```
-
-👉 For GPU: install from official PyTorch website
-
----
-
-### 3. FFmpeg
-
-Download from:
-https://ffmpeg.org/download.html
-
-Place inside project:
-
-```text
-ffmpeg/bin/ffmpeg.exe
-```
-
----
-
-### 4. yt-dlp
-
-Download from:
-https://github.com/yt-dlp/yt-dlp/releases
-
-Place in project root:
-
-```text
-yt-dlp.exe
-```
-
----
-
-## 📁 Project Structure
+## Folder Structure
 
 ```text
 YouTubeTools/
