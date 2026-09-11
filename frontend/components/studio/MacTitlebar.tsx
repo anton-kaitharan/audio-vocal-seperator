@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Download, PlusCircle, Activity, Globe, Sliders } from 'lucide-react';
+import { Download, PlusCircle, Activity, Sliders } from 'lucide-react';
 
 interface MacTitlebarProps {
   projectTitle: string;
@@ -20,7 +20,7 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
   return (
     <header style={{
       height: '46px',
-      background: 'var(--bg-darkest)',
+      background: '#ffffff',
       borderBottom: '1px solid var(--border-subtle)',
       display: 'flex',
       alignItems: 'center',
@@ -44,8 +44,8 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
             fontSize: '12px',
             fontWeight: 500,
             textDecoration: 'none',
-            color: activeRoute === 'landing' ? '#fff' : 'var(--text-secondary)',
-            background: activeRoute === 'landing' ? 'var(--bg-card)' : 'transparent',
+            color: activeRoute === 'landing' ? 'var(--text-primary)' : 'var(--text-secondary)',
+            background: activeRoute === 'landing' ? 'var(--bg-card-hover)' : 'transparent',
             transition: 'all 0.15s'
           }}>
             Home
@@ -56,8 +56,8 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
             fontSize: '12px',
             fontWeight: 600,
             textDecoration: 'none',
-            color: activeRoute === 'studio' ? '#fff' : 'var(--text-secondary)',
-            background: activeRoute === 'studio' ? 'var(--bg-card)' : 'transparent',
+            color: activeRoute === 'studio' ? 'var(--accent-purple)' : 'var(--text-secondary)',
+            background: activeRoute === 'studio' ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
             display: 'flex',
             alignItems: 'center',
             gap: '4px'
@@ -71,9 +71,9 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
             fontSize: '12px',
             fontWeight: 600,
             textDecoration: 'none',
-            color: activeRoute === 'test' ? '#fff' : '#10b981',
-            background: activeRoute === 'test' ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-            border: activeRoute === 'test' ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid transparent',
+            color: activeRoute === 'test' ? '#059669' : '#10b981',
+            background: activeRoute === 'test' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+            border: activeRoute === 'test' ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid transparent',
             display: 'flex',
             alignItems: 'center',
             gap: '5px'
@@ -93,7 +93,7 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
         left: '50%',
         transform: 'translateX(-50%)'
       }}>
-        <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.3px', color: '#fff' }}>
+        <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.3px', color: 'var(--text-primary)' }}>
           {projectTitle || 'Untitled Project'}
         </span>
         <span style={{
@@ -101,9 +101,9 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
           fontFamily: 'var(--font-mono)',
           padding: '2px 7px',
           borderRadius: '4px',
-          background: 'rgba(139, 92, 246, 0.15)',
+          background: 'rgba(124, 58, 237, 0.08)',
           color: 'var(--accent-purple)',
-          border: '1px solid rgba(139, 92, 246, 0.3)'
+          border: '1px solid rgba(124, 58, 237, 0.25)'
         }}>
           44.1kHz • 16-bit Master
         </span>
@@ -118,12 +118,13 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
             borderRadius: '6px',
             fontSize: '12px',
             fontWeight: 500,
-            background: 'var(--bg-card)',
-            color: '#fff',
+            background: '#ffffff',
+            color: 'var(--text-primary)',
             border: '1px solid var(--border-light)',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
             transition: 'all 0.15s'
           }}
           onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent-purple)')}
@@ -145,7 +146,7 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            boxShadow: '0 2px 10px rgba(124, 58, 237, 0.3)'
+            boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)'
           }}
         >
           <Download size={14} />

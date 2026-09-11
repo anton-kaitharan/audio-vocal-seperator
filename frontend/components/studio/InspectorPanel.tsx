@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Clock, Sliders, ChevronDown, Wand2, Sparkles, FolderArchive, Layers } from 'lucide-react';
+import { Clock, Sliders, ChevronDown, FolderArchive, Layers } from 'lucide-react';
 import { InspectorState } from '../../types/studio';
 
 interface InspectorPanelProps {
@@ -43,7 +43,8 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
         padding: '0 16px',
         height: '46px',
         alignItems: 'center',
-        gap: '20px'
+        gap: '20px',
+        background: '#ffffff'
       }}>
         <button
           onClick={() => setActiveTab('properties')}
@@ -53,7 +54,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             alignItems: 'center',
             fontSize: '13px',
             fontWeight: 600,
-            color: activeTab === 'properties' ? '#ffffff' : 'var(--text-secondary)',
+            color: activeTab === 'properties' ? 'var(--accent-purple)' : 'var(--text-secondary)',
             borderBottom: activeTab === 'properties' ? '2px solid var(--accent-purple)' : '2px solid transparent',
             padding: '0 4px',
             transition: 'all 0.15s'
@@ -69,7 +70,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             alignItems: 'center',
             fontSize: '13px',
             fontWeight: 500,
-            color: activeTab === 'assets' ? '#ffffff' : 'var(--text-secondary)',
+            color: activeTab === 'assets' ? 'var(--accent-purple)' : 'var(--text-secondary)',
             borderBottom: activeTab === 'assets' ? '2px solid var(--accent-purple)' : '2px solid transparent',
             padding: '0 4px',
             transition: 'all 0.15s'
@@ -109,14 +110,15 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                     onChange={(e) => onChange({ fadeType: e.target.value as any })}
                     style={{
                       width: '100%',
-                      background: 'var(--bg-surface)',
+                      background: '#ffffff',
                       border: '1px solid var(--border-light)',
                       borderRadius: '6px',
                       padding: '7px 24px 7px 10px',
                       fontSize: '12px',
-                      color: '#fff',
+                      color: 'var(--text-primary)',
                       appearance: 'none',
-                      outline: 'none'
+                      outline: 'none',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
                     }}
                   >
                     <option value="none">None</option>
@@ -138,14 +140,15 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                   onChange={(e) => onChange({ bezierParams: e.target.value })}
                   style={{
                     width: '100%',
-                    background: 'var(--bg-surface)',
+                    background: '#ffffff',
                     border: '1px solid var(--border-light)',
                     borderRadius: '6px',
                     padding: '7px 10px',
                     fontSize: '11px',
                     fontFamily: 'var(--font-mono)',
-                    color: '#fff',
-                    outline: 'none'
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
                   }}
                 />
               </div>
@@ -155,7 +158,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             <div style={{
               width: '100%',
               height: '95px',
-              background: 'var(--bg-surface)',
+              background: '#ffffff',
               border: '1px solid var(--border-light)',
               borderRadius: '8px',
               position: 'relative',
@@ -163,7 +166,8 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
               padding: '6px 8px',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
             }}>
               {/* Amplitude Scale Numbers */}
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', position: 'absolute', left: '8px', top: '6px', bottom: '6px', fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)', pointerEvents: 'none' }}>
@@ -176,18 +180,12 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
               {/* Interactive Curve SVG */}
               <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-                <defs>
-                  <linearGradient id="fadeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="var(--accent-purple)" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#c084fc" stopOpacity="0.3" />
-                  </linearGradient>
-                </defs>
                 {/* Horizontal Guide Lines */}
-                <line x1="38" y1="20" x2="100%" y2="20" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
-                <line x1="38" y1="47" x2="100%" y2="47" stroke="rgba(255,255,255,0.06)" strokeDasharray="2,2" />
-                <line x1="38" y1="75" x2="100%" y2="75" stroke="rgba(255,255,255,0.04)" strokeDasharray="2,2" />
+                <line x1="38" y1="20" x2="100%" y2="20" stroke="#f1f5f9" strokeWidth="1.5" strokeDasharray="3,3" />
+                <line x1="38" y1="47" x2="100%" y2="47" stroke="#e2e8f0" strokeWidth="1.5" strokeDasharray="3,3" />
+                <line x1="38" y1="75" x2="100%" y2="75" stroke="#f1f5f9" strokeWidth="1.5" strokeDasharray="3,3" />
 
-                {/* S-Curve Path matching screenshot */}
+                {/* S-Curve Path */}
                 <path
                   d="M 40 75 C 110 75, 170 30, 280 20"
                   fill="none"
@@ -195,8 +193,8 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                   strokeWidth="2.5"
                 />
                 {/* Keyframe Nodes */}
-                <circle cx="40" cy="75" r="3.5" fill="#fff" stroke="var(--accent-purple)" strokeWidth="1.5" />
-                <circle cx="280" cy="20" r="3.5" fill="#fff" stroke="var(--accent-purple)" strokeWidth="1.5" />
+                <circle cx="40" cy="75" r="4" fill="#ffffff" stroke="var(--accent-purple)" strokeWidth="2" />
+                <circle cx="280" cy="20" r="4" fill="#ffffff" stroke="var(--accent-purple)" strokeWidth="2" />
               </svg>
             </div>
           </div>
@@ -220,14 +218,15 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                   onChange={(e) => onChange({ selectedEffect: e.target.value })}
                   style={{
                     width: '100%',
-                    background: 'var(--bg-surface)',
+                    background: '#ffffff',
                     border: '1px solid var(--border-light)',
                     borderRadius: '6px',
                     padding: '8px 26px 8px 10px',
                     fontSize: '12px',
-                    color: '#fff',
+                    color: 'var(--text-primary)',
                     appearance: 'none',
-                    outline: 'none'
+                    outline: 'none',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
                   }}
                 >
                   <option value="Reverse audio">Reverse audio</option>
@@ -249,7 +248,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                   padding: '0 16px',
                   fontSize: '12px',
                   fontWeight: 600,
-                  boxShadow: '0 2px 10px var(--accent-purple-glow)',
+                  boxShadow: '0 2px 8px var(--accent-purple-glow)',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -285,9 +284,10 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
               <span style={{
                 fontSize: '12px',
                 fontFamily: 'var(--font-mono)',
-                color: '#fff',
+                color: 'var(--text-primary)',
                 minWidth: '60px',
-                textAlign: 'right'
+                textAlign: 'right',
+                fontWeight: 600
               }}>
                 {inspector.playbackSpeed.toFixed(2)} %
               </span>
@@ -321,9 +321,10 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
               <span style={{
                 fontSize: '12px',
                 fontFamily: 'var(--font-mono)',
-                color: '#fff',
+                color: 'var(--text-primary)',
                 minWidth: '68px',
-                textAlign: 'right'
+                textAlign: 'right',
+                fontWeight: 600
               }}>
                 {inspector.pitchShiftHz.toFixed(2)} Hz
               </span>
@@ -382,33 +383,35 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           </div>
 
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '8px',
             padding: '12px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px'
+            gap: '12px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
           }}>
             <Layers size={20} color="var(--accent-purple)" />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>Demucs 4-Stem Model</div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>Demucs 4-Stem Model</div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>htdemucs • 80 MB AI Cache</div>
             </div>
           </div>
 
           <div style={{
-            background: 'var(--bg-surface)',
+            background: '#ffffff',
             border: '1px solid var(--border-light)',
             borderRadius: '8px',
             padding: '12px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px'
+            gap: '12px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
           }}>
-            <FolderArchive size={20} color="#f97316" />
+            <FolderArchive size={20} color="#ea580c" />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>Master Audio Output</div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>Master Audio Output</div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>44.1kHz Stereo PCM WAV</div>
             </div>
           </div>

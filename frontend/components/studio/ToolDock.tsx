@@ -21,7 +21,7 @@ export const ToolDock: React.FC<ToolDockProps> = ({ activeTool, onSelectTool }) 
     <aside style={{
       width: '56px',
       height: '100%',
-      background: 'var(--bg-darkest)',
+      background: '#ffffff',
       borderRight: '1px solid var(--border-subtle)',
       display: 'flex',
       flexDirection: 'column',
@@ -31,19 +31,19 @@ export const ToolDock: React.FC<ToolDockProps> = ({ activeTool, onSelectTool }) 
       userSelect: 'none',
       zIndex: 30
     }}>
-      {/* App Logo Symbol matching screenshot */}
+      {/* App Logo Symbol */}
       <div style={{
         width: '36px',
         height: '36px',
         borderRadius: '8px',
-        background: 'rgba(255,255,255,0.04)',
+        background: '#f8fafc',
         border: '1px solid var(--border-light)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: '8px'
       }} title="AuraVocal Studio">
-        <Disc size={20} color="#fff" />
+        <Disc size={20} color="var(--accent-purple)" />
       </div>
 
       {/* Tool Icons */}
@@ -65,13 +65,13 @@ export const ToolDock: React.FC<ToolDockProps> = ({ activeTool, onSelectTool }) 
                 justifyContent: 'center',
                 background: isActive ? 'var(--accent-purple)' : 'transparent',
                 color: isActive ? '#ffffff' : 'var(--text-secondary)',
-                boxShadow: isActive ? '0 4px 12px var(--accent-purple-glow)' : 'none',
+                boxShadow: isActive ? '0 2px 8px var(--accent-purple-glow)' : 'none',
                 transition: 'all 0.15s ease'
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.color = '#ffffff';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.background = '#f1f5f9';
                 }
               }}
               onMouseLeave={(e) => {

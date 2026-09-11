@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, VolumeX, Lock, Unlock, MoreHorizontal, Copy, Download, Scissors, Trash2, Palette } from 'lucide-react';
+import { Volume2, VolumeX, Lock, Unlock, MoreHorizontal, Copy, Download, Scissors, Trash2 } from 'lucide-react';
 import { StemTrack } from '../../types/studio';
 
 interface TrackLaneProps {
@@ -28,7 +28,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Draw high-resolution studio waveform matching screenshot
+  // Draw high-resolution studio waveform
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -53,10 +53,9 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
     const totalBars = Math.floor(width / (barWidth + barGap));
     const seed = track.waveformSeed;
 
-    ctx.fillStyle = track.muted ? '#4b5563' : track.color;
+    ctx.fillStyle = track.muted ? '#94a3b8' : track.color;
 
     for (let i = 0; i < totalBars; i++) {
-      // Synthesize realistic audio waveform dynamics with deterministic pseudo-noise
       const t = i / totalBars;
       const noise =
         Math.sin(i * 0.15 + seed) * 0.4 +
@@ -75,9 +74,9 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
       ctx.fill();
     }
 
-    // If track has volume envelope automation (Track 1 in screenshot)
+    // Volume envelope automation
     if (track.envelopeCurve) {
-      ctx.strokeStyle = '#a855f7';
+      ctx.strokeStyle = '#9333ea';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, height * 0.65);
@@ -96,8 +95,8 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = '#8b5cf6';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#7c3aed';
+        ctx.lineWidth = 2;
         ctx.stroke();
       });
     }
@@ -108,7 +107,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
       height: '115px',
       borderBottom: '1px solid var(--border-subtle)',
       display: 'flex',
-      background: 'var(--bg-base)',
+      background: '#ffffff',
       position: 'relative',
       overflow: 'visible'
     }}>
@@ -117,7 +116,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
         width: '64px',
         height: '100%',
         borderRight: '1px solid var(--border-subtle)',
-        background: 'var(--bg-surface)',
+        background: '#f8fafc',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -140,7 +139,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
             <MoreHorizontal size={16} />
           </button>
 
-          {/* Context Menu matching screenshot */}
+          {/* Context Menu */}
           {menuOpen && (
             <div
               style={{
@@ -148,10 +147,10 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                 left: '28px',
                 top: '0',
                 width: '150px',
-                background: '#161622',
+                background: '#ffffff',
                 border: '1px solid var(--border-light)',
                 borderRadius: '8px',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                 padding: '4px',
                 zIndex: 50
               }}
@@ -165,11 +164,11 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                   gap: '8px',
                   padding: '7px 10px',
                   fontSize: '11px',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   borderRadius: '4px',
                   textAlign: 'left'
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 <Copy size={13} />
@@ -185,11 +184,11 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                   gap: '8px',
                   padding: '7px 10px',
                   fontSize: '11px',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   borderRadius: '4px',
                   textAlign: 'left'
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 <Download size={13} />
@@ -205,11 +204,11 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                   gap: '8px',
                   padding: '7px 10px',
                   fontSize: '11px',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   borderRadius: '4px',
                   textAlign: 'left'
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 <Scissors size={13} />
@@ -227,11 +226,11 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                   gap: '8px',
                   padding: '7px 10px',
                   fontSize: '11px',
-                  color: '#f87171',
+                  color: '#dc2626',
                   borderRadius: '4px',
                   textAlign: 'left'
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.12)')}
+                onMouseEnter={e => (e.currentTarget.style.background = '#fee2e2')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 <Trash2 size={13} />
@@ -245,7 +244,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
         <button
           onClick={() => onToggleMute(track.id)}
           style={{
-            color: track.muted ? '#ef4444' : 'var(--text-secondary)',
+            color: track.muted ? '#dc2626' : 'var(--text-secondary)',
             padding: '4px',
             borderRadius: '4px',
             display: 'flex'
@@ -278,15 +277,15 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
           top: '8px',
           left: '12px',
           fontSize: '11px',
-          fontWeight: 600,
+          fontWeight: 700,
           color: track.color,
           letterSpacing: '0.4px',
           textTransform: 'uppercase',
-          background: 'rgba(0,0,0,0.4)',
+          background: '#ffffff',
           padding: '2px 8px',
           borderRadius: '4px',
-          backdropFilter: 'blur(4px)',
-          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          border: '1px solid var(--border-subtle)',
           pointerEvents: 'none',
           zIndex: 5
         }}>
@@ -299,7 +298,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
           style={{ width: '100%', height: '100%', display: 'block' }}
         />
 
-        {/* Timestamp Annotation Avatars (from screenshot) */}
+        {/* Timestamp Annotation Avatars */}
         {track.markers?.map((marker) => {
           const leftPercent = (marker.time / duration) * 100;
           return (
@@ -321,15 +320,15 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                 width: '24px',
                 height: '24px',
                 borderRadius: '50%',
-                border: '2px solid #ffffff',
-                background: '#374151',
+                border: '2px solid var(--accent-purple)',
+                background: '#ffffff',
                 overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '10px',
-                color: '#fff',
+                color: 'var(--text-primary)',
                 fontWeight: 700
               }}>
                 {marker.avatarUrl ? (
@@ -343,7 +342,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                 height: 0,
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
-                borderTop: '5px solid #ffffff'
+                borderTop: '5px solid var(--accent-purple)'
               }} />
             </div>
           );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Youtube, UploadCloud, Loader2, Sparkles, Music } from 'lucide-react';
+import { X, Video, UploadCloud, Loader2, Sparkles, Music } from 'lucide-react';
 import { fetchYoutubeMetadata, submitSeparationJob } from '../../lib/api';
 
 interface ImportModalProps {
@@ -117,7 +117,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onImp
               gap: '6px'
             }}
           >
-            <Youtube size={16} color="#ef4444" />
+            <Video size={16} color="#ef4444" />
             YouTube Link
           </button>
           <button

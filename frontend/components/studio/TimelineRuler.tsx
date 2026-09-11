@@ -3,7 +3,7 @@
 import React from 'react';
 
 interface TimelineRulerProps {
-  duration: number; // in seconds (e.g. 30)
+  duration: number; // in seconds
   currentTime: number; // in seconds
   onSeek: (time: number) => void;
 }
@@ -33,7 +33,7 @@ export const TimelineRuler: React.FC<TimelineRulerProps> = ({
       onClick={handleRulerClick}
       style={{
         height: '32px',
-        background: 'var(--bg-darkest)',
+        background: '#f8fafc',
         borderBottom: '1px solid var(--border-subtle)',
         position: 'relative',
         cursor: 'pointer',
@@ -60,7 +60,7 @@ export const TimelineRuler: React.FC<TimelineRulerProps> = ({
               pointerEvents: 'none'
             }}
           >
-            <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', fontWeight: 600 }}>
               {sec}
             </span>
             <div style={{ width: '1px', height: '6px', background: 'var(--border-light)', margin: '0 auto' }} />
@@ -81,7 +81,7 @@ export const TimelineRuler: React.FC<TimelineRulerProps> = ({
               bottom: 0,
               width: '1px',
               height: '4px',
-              background: 'rgba(255,255,255,0.08)',
+              background: '#cbd5e1',
               pointerEvents: 'none'
             }}
           />
@@ -103,7 +103,7 @@ export const TimelineRuler: React.FC<TimelineRulerProps> = ({
           <path
             d="M 1 1 L 13 1 L 13 10 L 7 17 L 1 10 Z"
             fill="var(--playhead-red)"
-            stroke="#991b1b"
+            stroke="#b91c1c"
             strokeWidth="1"
           />
         </svg>

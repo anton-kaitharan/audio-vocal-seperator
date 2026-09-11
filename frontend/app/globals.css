@@ -1,28 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --bg-darkest: #07070a;
-  --bg-base: #0d0d14;
-  --bg-surface: #13131c;
-  --bg-card: #181824;
-  --bg-card-hover: #1f1f2e;
-  --border-subtle: #222232;
-  --border-light: #2c2c42;
-  --border-focus: #8b5cf6;
+  --bg-darkest: #ffffff;
+  --bg-base: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --border-light: #cbd5e1;
+  --border-focus: #7c3aed;
 
-  --text-primary: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --text-dim: #4b5563;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
 
-  /* Stem Palette from Screenshot */
-  --stem-vocals: #8b5cf6;
-  --stem-backing: #a855f7;
-  --stem-drums: #f97316;
-  --stem-bass: #06b6d4;
+  /* Stem Palette */
+  --stem-vocals: #7c3aed;
+  --stem-backing: #9333ea;
+  --stem-drums: #ea580c;
+  --stem-bass: #0284c7;
 
-  --accent-purple: #8b5cf6;
-  --accent-purple-glow: rgba(139, 92, 246, 0.35);
+  --accent-purple: #7c3aed;
+  --accent-purple-glow: rgba(124, 58, 237, 0.25);
   --playhead-red: #ef4444;
 
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -51,14 +51,14 @@ html, body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-darkest);
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2b2b3d;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b3b54;
+  background: #94a3b8;
 }
 
 /* Base Form & Control Styles */
@@ -81,7 +81,7 @@ input[type="range"] {
   appearance: none;
   width: 100%;
   height: 4px;
-  background: #2a2a3c;
+  background: #e2e8f0;
   border-radius: 2px;
   outline: none;
 }
@@ -95,7 +95,7 @@ input[type="range"]::-webkit-slider-thumb {
   background: #ffffff;
   border: 2px solid var(--accent-purple);
   cursor: pointer;
-  box-shadow: 0 0 10px var(--accent-purple-glow);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   transition: transform 0.1s ease;
 }
 
