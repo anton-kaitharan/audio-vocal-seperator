@@ -20,6 +20,7 @@ export default function StudioPage() {
   const [activeTool, setActiveTool] = useState('select');
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState<string>('');
 
   // Inspector State
   const [inspector, setInspector] = useState<InspectorState>({
@@ -257,13 +258,17 @@ export default function StudioPage() {
       <ImportModal
         isOpen={importOpen}
         onClose={() => setImportOpen(false)}
-        onImportSuccess={(trackName) => setProjectTitle(trackName.replace(/ /g, '_'))}
+        onImportSuccess={(trackName, url) => {
+          setProjectTitle(trackName.replace(/ /g, '_'));
+          if (url) setDownloadUrl(url);
+        }}
       />
 
       <ExportModal
         isOpen={exportOpen}
         onClose={() => setExportOpen(false)}
         projectTitle={projectTitle}
+        downloadUrl={downloadUrl}
       />
     </div>
   );

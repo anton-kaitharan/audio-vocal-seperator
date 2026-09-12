@@ -1,0 +1,5 @@
+# Modal Configuration File
+# https://modal.com/docs/reference/modal.toml
+
+[default]
+app_name = "auravocal-backend"

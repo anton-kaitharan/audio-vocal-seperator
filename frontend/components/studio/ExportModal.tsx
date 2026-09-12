@@ -7,9 +7,10 @@ interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   projectTitle: string;
+  downloadUrl?: string;
 }
 
-export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, projectTitle }) => {
+export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, projectTitle, downloadUrl }) => {
   const [format, setFormat] = useState<'wav' | 'mp3' | 'zip'>('wav');
   const [downloaded, setDownloaded] = useState(false);
 
@@ -18,8 +19,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
   const handleDownload = () => {
     setDownloaded(true);
     const element = document.createElement('a');
-    element.href = `http://localhost:5000/api/files`;
+    element.href = downloadUrl || `http://localhost:5000/api/files`;
+    element.target = downloadUrl ? '_blank' : '_self';
     element.setAttribute('download', `${projectTitle}_master.${format}`);
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
     setTimeout(() => {
       setDownloaded(false);
       onClose();

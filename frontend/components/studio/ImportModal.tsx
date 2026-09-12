@@ -7,7 +7,7 @@ import { fetchYoutubeMetadata, submitSeparationJob } from '../../lib/api';
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImportSuccess: (trackTitle: string) => void;
+  onImportSuccess: (trackTitle: string, downloadUrl?: string) => void;
 }
 
 export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onImportSuccess }) => {
@@ -50,13 +50,13 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onImp
     });
 
     setIsSubmitting(false);
-    if (res.status === 'queued') {
-      onImportSuccess(title || 'Separated Stems Track');
+    if (res.status === 'completed' || res.status === 'queued') {
+      onImportSuccess(title || 'Separated Stems Track', res.download_url);
       onClose();
     } else {
       setMessage({ text: res.error || 'Notice: Offline mock job initialized for testing.', isError: false });
       setTimeout(() => {
-        onImportSuccess(title || 'Separated Stems Track');
+        onImportSuccess(title || 'Separated Stems Track', res.download_url);
         onClose();
       }, 1000);
     }

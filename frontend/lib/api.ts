@@ -27,7 +27,7 @@ export async function submitSeparationJob(payload: {
   title?: string;
   start?: string;
   end?: string;
-}): Promise<{ status: string; filename?: string; error?: string }> {
+}): Promise<{ status: string; filename?: string; download_url?: string; r2_key?: string; duration_seconds?: number; error?: string }> {
   try {
     const res = await fetch(`${BACKEND_URL}/api/jobs`, {
       method: 'POST',

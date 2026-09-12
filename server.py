@@ -10,6 +10,14 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import httpx
+from dotenv import load_dotenv
+
+BASE = os.path.dirname(os.path.abspath(__file__))
+for env_name in [".env", "py.env"]:
+    env_file = os.path.join(BASE, env_name)
+    if os.path.exists(env_file):
+        load_dotenv(env_file)
 
 if sys.platform == "win32":
     try:
@@ -189,7 +197,7 @@ def get_jobs():
     }
 
 @app.post("/api/jobs")
-def create_job(req: JobCreateRequest):
+async def create_job(req: JobCreateRequest):
     url = clean_url(req.url)
     if not ("youtube.com" in url or "youtu.be" in url):
         raise HTTPException(status_code=400, detail="Must be a valid YouTube URL")
@@ -199,6 +207,59 @@ def create_job(req: JobCreateRequest):
     if not title:
         title = "youtube_track"
 
+    modal_endpoint = os.getenv("MODAL_API_URL")
+    modal_app_name = os.getenv("MODAL_APP_NAME")
+
+    # 1. Primary path: Serverless Modal GPU HTTP Webhook
+    if modal_endpoint:
+        try:
+            async with httpx.AsyncClient(timeout=600.0) as client:
+                payload = {
+                    "url": url,
+                    "title": title,
+                    "start": req.start.strip() if req.start else None,
+                    "end": req.end.strip() if req.end else None
+                }
+                resp = await client.post(modal_endpoint, json=payload)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("status") == "error":
+                        raise HTTPException(status_code=500, detail=data.get("error", "Modal processing error"))
+                    return {
+                        "status": "completed",
+                        "title": data.get("title", title),
+                        "r2_key": data.get("r2_key"),
+                        "download_url": data.get("download_url"),
+                        "duration_seconds": data.get("duration_seconds")
+                    }
+                else:
+                    raise HTTPException(status_code=resp.status_code, detail=f"Modal error: {resp.text}")
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Modal invocation error: {e}")
+
+    # 2. Secondary path: Modal Python SDK Function.lookup if modal is installed
+    if modal_app_name:
+        try:
+            import modal
+            fn = modal.Function.lookup(modal_app_name, "separate_track")
+            payload = {
+                "url": url,
+                "title": title,
+                "start": req.start.strip() if req.start else None,
+                "end": req.end.strip() if req.end else None
+            }
+            res = fn.remote(payload)
+            if res.get("status") == "error":
+                raise HTTPException(status_code=500, detail=res.get("error", "Modal SDK error"))
+            return res
+        except HTTPException:
+            raise
+        except Exception as e:
+            print(f"[Modal Python SDK Warning] {e}")
+
+    # 3. Fallback: Local folder queue mode (if Modal is not yet configured)
     safe_title = title.replace(" ", "_")
     target_path = os.path.join(QUEUE_DIR, f"{safe_title}.txt")
     counter = 1
