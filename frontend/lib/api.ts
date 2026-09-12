@@ -45,7 +45,7 @@ export async function fetchJobsList() {
     const res = await fetch(`${BACKEND_URL}/api/jobs`, { cache: 'no-store' });
     return await res.json();
   } catch {
-    return { processing: [], queue: [], done: [] };
+    return { processing: [], queue: [], done: [], failed: [] };
   }
 }
 

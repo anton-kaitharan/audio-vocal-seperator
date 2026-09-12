@@ -29,7 +29,7 @@ import { BackendStatus } from '../../types/studio';
 export default function TestRouterPage() {
   const [status, setStatus] = useState<BackendStatus | null>(null);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [jobs, setJobs] = useState<{ processing: any[]; queue: any[]; done: any[] }>({ processing: [], queue: [], done: [] });
+  const [jobs, setJobs] = useState<{ processing: any[]; queue: any[]; done: any[]; failed?: any[] }>({ processing: [], queue: [], done: [], failed: [] });
   const [selectedJob, setSelectedJob] = useState<string>('');
   const [logText, setLogText] = useState<string>('Select a job or trigger an action to view real-time logs...');
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +60,8 @@ export default function TestRouterPage() {
       setSelectedJob(jList.processing[0].filename);
     } else if (jList.done.length > 0 && !selectedJob) {
       setSelectedJob(jList.done[0].filename);
+    } else if (jList.failed && jList.failed.length > 0 && !selectedJob) {
+      setSelectedJob(jList.failed[0].filename);
     }
   };
 
@@ -345,6 +347,9 @@ export default function TestRouterPage() {
                 <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{status?.processing_count || 0}</span> processing •{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{status?.queue_count || 0}</span> queued •{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{status?.output_count || 0}</span> outputs
+                {Boolean(status?.failed_count) && (
+                  <span style={{ color: '#dc2626', fontWeight: 600 }}> • {status?.failed_count} failed</span>
+                )}
               </div>
             </div>
           </div>
@@ -546,6 +551,9 @@ export default function TestRouterPage() {
                   ))}
                   {jobs.done.map((j) => (
                     <option key={j.filename} value={j.filename}>✓ {j.title || j.filename}</option>
+                  ))}
+                  {jobs.failed && jobs.failed.map((j) => (
+                    <option key={j.filename} value={j.filename}>✗ {j.title || j.filename} (Failed)</option>
                   ))}
                 </select>
               </div>

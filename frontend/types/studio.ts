@@ -51,5 +51,6 @@ export interface BackendStatus {
   queue_count: number;
   processing_count: number;
   done_count: number;
+  failed_count?: number;
   output_count: number;
 }

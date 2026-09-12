@@ -26,6 +26,7 @@ for env_file in ["py.env", ".env"]:
 WATCH      = os.path.join(BASE, "queue")
 PROCESSING = os.path.join(BASE, "processing")
 DONE       = os.path.join(BASE, "done")
+FAILED     = os.path.join(BASE, "failed")
 OUTPUT     = os.path.join(BASE, "output")
 LOGS       = os.path.join(BASE, "logs")
 MODELS     = os.path.join(BASE, "models")
@@ -99,8 +100,8 @@ def tg_send_file(wav_path, title, logfile):
         tg_send(f"{title}\nWAV is {wav_size_mb:.1f} MB - converting to MP3 for sending...\nWAV is saved in output folder.")
 
         subprocess.run(
-            f'"{FFMPEG}" -y -i "{wav_path}" -codec:a libmp3lame -qscale:a 0 "{mp3_path}"',
-            shell=True, capture_output=True, text=True
+            [FFMPEG, "-y", "-i", wav_path, "-codec:a", "libmp3lame", "-qscale:a", "0", mp3_path],
+            capture_output=True, text=True
         )
 
         if not os.path.exists(mp3_path):
@@ -133,7 +134,6 @@ def tg_send_file(wav_path, title, logfile):
         else:
             log(f"[TG ERROR] sendAudio failed: {resp.text}", logfile)
             tg_send(f"Could not send file. Find it at:\noutput\\{os.path.basename(send_path)}")
-            # Don't delete MP3 if send failed - keep it as backup
     except Exception as e:
         log(f"[TG ERROR] {e}", logfile)
         tg_send(f"File send error: {e}")
@@ -145,11 +145,15 @@ def log(msg, logfile):
         f.write(msg + "\n")
 
 def clean_title(title):
-    title = re.sub(r"[\\/*?:\"<>|]", "", title)
+    title = re.sub(r'[\\/*?:"<>|%&^$#]', "", title)
     return title.strip()
 
 def clean_url(url):
-    match = re.search(r"(https?://(?:www\.)?youtube\.com/watch\?v=[^&]+)", url)
+    url = url.strip()
+    match = re.search(r"(https?://(?:www\.|music\.)?youtube\.com/watch\?v=[^&]+)", url)
+    if match:
+        return match.group(1)
+    match = re.search(r"(https?://(?:www\.)?youtube\.com/shorts/[^?&]+)", url)
     if match:
         return match.group(1)
     match = re.search(r"(https?://youtu\.be/[^?&]+)", url)
@@ -159,9 +163,10 @@ def clean_url(url):
 
 # ---------- PROGRESS ----------
 def run_with_progress(cmd, stage, logfile):
+    use_shell = isinstance(cmd, str)
     process = subprocess.Popen(
         cmd,
-        shell=True,
+        shell=use_shell,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -178,7 +183,9 @@ def run_with_progress(cmd, stage, logfile):
             m = re.search(r"(\d{1,3}\.\d+)%", line)
             if m:
                 log(f"Downloading... {m.group(1)}%", logfile)
-            elif "error" in line.lower():
+            elif any(k in line.lower() for k in ["error", "warning", "forbidden", "http"]):
+                log(f"[yt-dlp] {line}", logfile)
+            elif "[download]" in line or "[extractaudio]" in line.lower():
                 log(f"[yt-dlp] {line}", logfile)
 
         elif stage == "demucs":
@@ -188,7 +195,7 @@ def run_with_progress(cmd, stage, logfile):
             m = re.search(r"time=(\d+:\d+:\d+\.\d+)", line)
             if m:
                 log(f"Processing... {m.group(1)}", logfile)
-            elif "error" in line.lower():
+            elif "error" in line.lower() or "warning" in line.lower():
                 log(f"[ffmpeg] {line}", logfile)
 
     process.wait()
@@ -199,13 +206,15 @@ def process_job(proc_path):
     name    = os.path.basename(proc_path)
     logfile = os.path.join(LOGS, name.replace(".txt", ".log"))
 
-    input_wav  = None
-    sep_folder = None
+    input_wav    = None
+    trimmed_temp = None
+    sep_folder   = None
+    success      = False
 
     try:
         log(f"\nProcessing: {name}", logfile)
 
-        with open(proc_path, "r", encoding="utf-8") as f:
+        with open(proc_path, "r", encoding="utf-8", errors="replace") as f:
             lines = [l.strip() for l in f if l.strip()]
 
         if len(lines) < 2:
@@ -225,9 +234,6 @@ def process_job(proc_path):
 
         input_wav   = os.path.join(BASE, f"{title}_input.wav")
         output_file = os.path.join(OUTPUT, f"{title}_karoke.wav")
-        stem_name   = f"{title}_input"
-        sep_folder  = os.path.join(SEPARATED, "htdemucs", stem_name)
-        source      = os.path.join(sep_folder, "no_vocals.wav")
 
         log(f"Title  : {title}", logfile)
         log(f"URL    : {url}", logfile)
@@ -239,31 +245,65 @@ def process_job(proc_path):
         # DOWNLOAD
         log("Starting download...", logfile)
         temp_template = os.path.join(BASE, f"{title}_input.%(ext)s")
-        run_with_progress(
-            f'"{YTDLP}" -f bestaudio -x --audio-format wav -o "{temp_template}" "{url}"',
-            "download", logfile
-        )
-        if not os.path.exists(input_wav):
-            log("ERROR: Download failed.", logfile)
+
+        ffmpeg_dir = os.path.dirname(FFMPEG) if (FFMPEG and os.path.exists(FFMPEG)) else ""
+        dl_cmd = [YTDLP, "--no-playlist"]
+        if shutil.which("node"):
+            dl_cmd.extend(["--js-runtimes", "node"])
+        if ffmpeg_dir and os.path.exists(ffmpeg_dir):
+            dl_cmd.extend(["--ffmpeg-location", ffmpeg_dir])
+        dl_cmd.extend([
+            "-f", "bestaudio",
+            "-x", "--audio-format", "wav",
+            "--retries", "3",
+            "-o", temp_template,
+            url
+        ])
+
+        ret = run_with_progress(dl_cmd, "download", logfile)
+        if ret != 0 or not os.path.exists(input_wav):
+            log(f"ERROR: Download failed (exit code {ret}).", logfile)
             tg_send(f"ERROR: Download failed for {title}")
             return
+
+        # Optimization: If start and end are provided, trim input before Demucs to save immense GPU/CPU time
+        demucs_input = input_wav
+        if start and end:
+            log(f"Trimming audio segment: {start} -> {end}...", logfile)
+            trimmed_temp = os.path.join(BASE, f"{title}_input_trimmed.wav")
+            trim_cmd = [
+                FFMPEG, "-y",
+                "-ss", start, "-to", end,
+                "-i", input_wav,
+                "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2",
+                trimmed_temp
+            ]
+            t_ret = subprocess.run(trim_cmd, capture_output=True, text=True)
+            if t_ret.returncode == 0 and os.path.exists(trimmed_temp):
+                demucs_input = trimmed_temp
+                log("Input segment trimmed successfully. Demucs will separate only the requested portion.", logfile)
+            else:
+                log(f"Trim notice: Fast trim skipped ({t_ret.stderr}), running full track separation.", logfile)
 
         tg_send(f"{title}\nDownload done. Separating vocals...")
 
         # DEMUCS
         log("Starting vocal separation...", logfile)
-        run_with_progress(
-            f'"{DEMUCS}" --two-stems=vocals --out "{SEPARATED}" "{input_wav}"',
-            "demucs", logfile
-        )
+        demucs_cmd = [DEMUCS, "--two-stems=vocals", "--out", SEPARATED, demucs_input]
+        run_with_progress(demucs_cmd, "demucs", logfile)
+
+        stem_name = os.path.splitext(os.path.basename(demucs_input))[0]
+        sep_folder = os.path.join(SEPARATED, "htdemucs", stem_name)
+        source = os.path.join(sep_folder, "no_vocals.wav")
+
         if not os.path.exists(source):
-            log(f"ERROR: Demucs failed.", logfile)
+            log("ERROR: Demucs separation failed - no_vocals.wav not found.", logfile)
             tg_send(f"ERROR: Demucs failed for {title}")
             return
 
         tg_send(f"{title}\nVocals removed. Processing audio...")
 
-        # FFMPEG - force 1411kbps PCM WAV
+        # FFMPEG - post-processing
         log("Processing audio...", logfile)
         af = (
             "silenceremove=start_periods=1:start_duration=0.5:start_threshold=-40dB,"
@@ -272,22 +312,23 @@ def process_job(proc_path):
             "areverse,"
             "loudnorm"
         )
-        format_flags = "-acodec pcm_s16le -ar 44100 -ac 2"
+        format_flags = ["-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2"]
 
-        if start and end:
-            cmd = f'"{FFMPEG}" -y -ss {start} -to {end} -i "{source}" -af "{af}" {format_flags} "{output_file}"'
+        if start and end and demucs_input != trimmed_temp:
+            cmd = [FFMPEG, "-y", "-ss", start, "-to", end, "-i", source, "-af", af] + format_flags + [output_file]
         else:
-            cmd = f'"{FFMPEG}" -y -i "{source}" -af "{af}" {format_flags} "{output_file}"'
+            cmd = [FFMPEG, "-y", "-i", source, "-af", af] + format_flags + [output_file]
 
         run_with_progress(cmd, "ffmpeg", logfile)
 
         if not os.path.exists(output_file):
-            log("ERROR: FFmpeg failed.", logfile)
+            log("ERROR: FFmpeg post-processing failed.", logfile)
             tg_send(f"ERROR: FFmpeg failed for {title}")
             return
 
         log(f"[OK] Saved: {output_file}", logfile)
         tg_send(f"Done processing: {title}\nSending file...")
+        success = True
 
         # SEND - WAV if under 50MB, else MP3 (deleted after sending)
         tg_send_file(output_file, title, logfile)
@@ -298,19 +339,34 @@ def process_job(proc_path):
 
     finally:
         if sep_folder and os.path.exists(sep_folder):
-            subprocess.run(f'rmdir /s /q "{sep_folder}"', shell=True)
+            try:
+                shutil.rmtree(sep_folder, ignore_errors=True)
+            except Exception:
+                pass
         if input_wav and os.path.exists(input_wav):
             try:
                 os.remove(input_wav)
                 log(f"Cleaned: {input_wav}", logfile)
             except Exception as e:
                 log(f"Cleanup warning: {e}", logfile)
+        if trimmed_temp and os.path.exists(trimmed_temp):
+            try:
+                os.remove(trimmed_temp)
+            except Exception:
+                pass
 
-        done_path = os.path.join(DONE, name)
+        target_dir = DONE if success else FAILED
+        target_path = os.path.join(target_dir, name)
         if os.path.exists(proc_path):
-            if os.path.exists(done_path):
-                os.remove(done_path)
-            os.rename(proc_path, done_path)
+            if os.path.exists(target_path):
+                try:
+                    os.remove(target_path)
+                except Exception:
+                    pass
+            try:
+                os.rename(proc_path, target_path)
+            except Exception as e:
+                log(f"Move error: {e}", logfile)
 
 # ---------- WORKER ----------
 def worker():
@@ -338,7 +394,7 @@ def scan_folder():
 
 # ---------- START ----------
 if __name__ == "__main__":
-    for folder in [WATCH, PROCESSING, DONE, OUTPUT, LOGS, MODELS, SEPARATED]:
+    for folder in [WATCH, PROCESSING, DONE, FAILED, OUTPUT, LOGS, MODELS, SEPARATED]:
         os.makedirs(folder, exist_ok=True)
 
     print("=" * 45)
@@ -346,6 +402,7 @@ if __name__ == "__main__":
     print("=" * 45)
     print(f"Queue    : {WATCH}")
     print(f"Output   : {OUTPUT}")
+    print(f"Failed   : {FAILED}")
     print(f"Models   : {MODELS}")
     print(f"TG Token : {'OK' if BOT_TOKEN else 'MISSING - check py.env or .env'}")
     print(f"TG ChatID: {CHAT_ID if CHAT_ID else 'MISSING - check py.env or .env'}")

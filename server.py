@@ -23,6 +23,7 @@ STATIC_DIR = os.path.join(BASE, "static")
 QUEUE_DIR = os.path.join(BASE, "queue")
 PROCESSING_DIR = os.path.join(BASE, "processing")
 DONE_DIR = os.path.join(BASE, "done")
+FAILED_DIR = os.path.join(BASE, "failed")
 OUTPUT_DIR = os.path.join(BASE, "output")
 LOGS_DIR = os.path.join(BASE, "logs")
 MODELS_DIR = os.path.join(BASE, "models")
@@ -30,7 +31,7 @@ YTDLP_EXE = os.path.join(BASE, "yt-dlp.exe")
 if not os.path.exists(YTDLP_EXE):
     YTDLP_EXE = shutil.which("yt-dlp") or "yt-dlp"
 
-for d in [STATIC_DIR, QUEUE_DIR, PROCESSING_DIR, DONE_DIR, OUTPUT_DIR, LOGS_DIR, MODELS_DIR]:
+for d in [STATIC_DIR, QUEUE_DIR, PROCESSING_DIR, DONE_DIR, FAILED_DIR, OUTPUT_DIR, LOGS_DIR, MODELS_DIR]:
     os.makedirs(d, exist_ok=True)
 
 app = FastAPI(title="Karaoke Vocal Separator API")
@@ -61,7 +62,10 @@ def is_watcher_running() -> bool:
 
 def clean_url(url: str) -> str:
     url = url.strip()
-    m = re.search(r"(https?://(?:www\.)?youtube\.com/watch\?v=[^&]+)", url)
+    m = re.search(r"(https?://(?:www\.|music\.)?youtube\.com/watch\?v=[^&]+)", url)
+    if m:
+        return m.group(1)
+    m = re.search(r"(https?://(?:www\.)?youtube\.com/shorts/[^?&]+)", url)
     if m:
         return m.group(1)
     m = re.search(r"(https?://youtu\.be/[^?&]+)", url)
@@ -92,6 +96,15 @@ def parse_job_file(file_path: str):
     
     log_file = os.path.join(LOGS_DIR, name.replace(".txt", ".log"))
     has_log = os.path.exists(log_file)
+    has_error = False
+    if has_log:
+        try:
+            with open(log_file, "r", encoding="utf-8", errors="replace") as lf:
+                log_txt = lf.read()
+                if "ERROR:" in log_txt or "HTTP Error 403" in log_txt:
+                    has_error = True
+        except Exception:
+            pass
     
     return {
         "filename": name,
@@ -101,7 +114,8 @@ def parse_job_file(file_path: str):
         "end": end,
         "mtime": stat.st_mtime,
         "size": stat.st_size,
-        "has_log": has_log
+        "has_log": has_log,
+        "has_error": has_error
     }
 
 class JobCreateRequest(BaseModel):
@@ -129,6 +143,7 @@ def get_status():
         "queue_count": len([f for f in os.listdir(QUEUE_DIR) if f.endswith(".txt")]),
         "processing_count": len([f for f in os.listdir(PROCESSING_DIR) if f.endswith(".txt")]),
         "done_count": len([f for f in os.listdir(DONE_DIR) if f.endswith(".txt")]),
+        "failed_count": len([f for f in os.listdir(FAILED_DIR) if f.endswith(".txt")]),
         "output_count": len([f for f in os.listdir(OUTPUT_DIR) if f.endswith(".wav") or f.endswith(".mp3")]),
     }
 
@@ -138,20 +153,24 @@ def get_youtube_metadata(url: str = Query(...)):
     if not ("youtube.com" in url or "youtu.be" in url):
         raise HTTPException(status_code=400, detail="Invalid YouTube URL")
     try:
+        cmd = [YTDLP_EXE, "--no-playlist"]
+        if shutil.which("node"):
+            cmd.extend(["--js-runtimes", "node"])
+        cmd.extend(["--print", "title", "--print", "duration_string", url])
         res = subprocess.run(
-            [YTDLP_EXE, "--no-playlist", "--print", "title", "--print", "duration_string", url],
+            cmd,
             capture_output=True,
             text=True,
-            timeout=12
+            timeout=25
         )
         if res.returncode == 0:
             lines = res.stdout.strip().splitlines()
             title = lines[0] if len(lines) > 0 else "YouTube Song"
             duration = lines[1] if len(lines) > 1 else ""
-            clean_title = re.sub(r"[\\/*?:\"<>|]", "", title).strip()
+            clean_title = re.sub(r'[\\/*?:"<>|%&^$#]', "", title).strip()
             return {"title": clean_title, "duration": duration, "url": url}
         else:
-            return {"title": "", "duration": "", "url": url, "error": res.stderr}
+            return {"title": "", "duration": "", "url": url, "error": res.stderr.strip() or "Failed to fetch metadata"}
     except Exception as e:
         return {"title": "", "duration": "", "url": url, "error": str(e)}
 
@@ -166,6 +185,7 @@ def get_jobs():
         "processing": get_list(PROCESSING_DIR),
         "queue": get_list(QUEUE_DIR),
         "done": get_list(DONE_DIR),
+        "failed": get_list(FAILED_DIR),
     }
 
 @app.post("/api/jobs")
@@ -175,7 +195,7 @@ def create_job(req: JobCreateRequest):
         raise HTTPException(status_code=400, detail="Must be a valid YouTube URL")
 
     title = req.title.strip() if req.title else "youtube_track"
-    title = re.sub(r"[\\/*?:\"<>|]", "", title).strip()
+    title = re.sub(r'[\\/*?:"<>|%&^$#]', "", title).strip()
     if not title:
         title = "youtube_track"
 
@@ -197,7 +217,7 @@ def create_job(req: JobCreateRequest):
 
 @app.delete("/api/jobs/{folder}/{filename}")
 def delete_job(folder: str, filename: str):
-    allowed_folders = {"queue": QUEUE_DIR, "processing": PROCESSING_DIR, "done": DONE_DIR}
+    allowed_folders = {"queue": QUEUE_DIR, "processing": PROCESSING_DIR, "done": DONE_DIR, "failed": FAILED_DIR}
     if folder not in allowed_folders:
         raise HTTPException(status_code=400, detail="Invalid folder")
 
@@ -266,6 +286,9 @@ def start_watcher():
     if is_watcher_running():
         return {"status": "already_running"}
     python_exe = sys.executable
+    venv_py = os.path.join(BASE, "demucs_ext", "Scripts", "python.exe")
+    if os.path.exists(venv_py):
+        python_exe = venv_py
     watch_script = os.path.join(BASE, "watch.py")
     subprocess.Popen([python_exe, watch_script], cwd=BASE)
     return {"status": "started"}
