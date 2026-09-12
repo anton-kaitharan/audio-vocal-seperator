@@ -25,176 +25,84 @@ YouTubeTools/
 
 ---
 
-## ⚙️ Setup
+## Setup
 
-### 1. Clone Repository
+### 1. Prerequisites
+- Windows 10/11
+- Python 3.10 or later — https://www.python.org/downloads/
+- Git — https://git-scm.com/
 
-```bash
-git clone https://github.com/yourusername/yourrepo.git
-cd yourrepo
+### 2. Clone the repo
+```bat
+git clone https://github.com/anton-kaitharan/YouTubeTools.git
+cd YouTubeTools
 ```
 
----
-
-### 2. Install Python Dependencies
-
-```bash
+### 3. Create venv and install dependencies
+```bat
+python -m venv demucs_ext
+demucs_ext\Scripts\activate
 pip install -r requirements.txt
 ```
 
----
+### 4. Download yt-dlp
+Download `yt-dlp.exe` from https://github.com/yt-dlp/yt-dlp/releases/latest
+Place it in the `YouTubeTools/` folder.
 
-### 3. (Optional) Activate Virtual Environment
+### 5. Download FFmpeg
+Download the essentials build from https://www.gyan.dev/ffmpeg/builds/
+Extract and place the `ffmpeg/` folder so the path is:
+`YouTubeTools\ffmpeg\bin\ffmpeg.exe`
 
-```bash
-demucs_ext\Scripts\activate
+### 6. Set up Telegram Bot
+1. Message **@BotFather** on Telegram → `/newbot` → copy the token
+2. Message **@userinfobot** → copy your user ID
+3. Create `bot.py` (not in repo — contains your token):
+```python
+BOT_TOKEN  = "YOUR_TOKEN"
+ALLOWED_ID = 123456789
 ```
 
 ---
 
-## ▶️ How to Run
+## Usage
 
-### Run the script:
+### Option A — Manual (run.bat)
+Double-click `run.bat` and follow the prompts.
 
-```bash
-run.bat
+### Option B — Queue system (watch.py + bot.py)
+Run both in separate cmd windows:
+```bat
+:: Window 1
+python watch.py
+
+:: Window 2
+python bot.py
 ```
+
+Then from your phone, message your Telegram bot:
+```
+https://youtube.com/watch?v=abc123
+Song Title Here
+```
+Or with trim:
+```
+https://youtube.com/watch?v=abc123
+Song Title Here
+00:00:10
+00:03:30
+```
+
+The bot queues the job, `watch.py` processes it, and sends the finished WAV file back to your Telegram.
+
+### Telegram Bot Commands
+- `/start` — show help
+- `/list` — show pending jobs
+- `/done` — show completed jobs
 
 ---
 
-## 📥 Usage
-
-After running, you will see:
-
-```
-Paste YouTube URL:
-Enter start time (hh:mm:ss) or press Enter:
-Enter end time (hh:mm:ss) or press Enter:
-```
-
----
-
-### ✅ Example 1 (Full audio)
-
-```
-https://youtube.com/xyz
-```
-
----
-
-### ✂️ Example 2 (Trimmed)
-
-```
-https://youtube.com/xyz
-Start: 00:00:10
-End:   00:01:30
-```
-
----
-
-## 📤 Output
-
-The final file will be saved as:
-
-```text
-SongName_no_vocals.wav
-```
-
----
-
-## 🔄 Batch Usage
-
-After finishing one file, the script will ask again:
-
-```
-Paste YouTube URL:
-```
-
-👉 You can process multiple songs continuously
-
-To exit:
-
-```
-exit
-```
-
----
-
-## ⚠️ Important Notes
-
-* 💻 Your PC must stay ON during processing
-* 🌐 Internet required for downloading
-* ⚡ Processing speed depends on CPU/GPU
-* 💾 External hard drive works perfectly
-* 📦 First run may download model files (Demucs)
-
----
-
-## 🐛 Common Issues
-
-### ❌ Script closes immediately
-
-* Run from Command Prompt instead of double-click
-
----
-
-### ❌ yt-dlp error
-
-Update:
-
-```bash
-yt-dlp -U
-```
-
----
-
-### ❌ Demucs error
-
-Reinstall:
-
-```bash
-pip install demucs
-```
-
----
-
-### ❌ FFmpeg not found
-
-Check this path exists:
-
-```text
-ffmpeg/bin/ffmpeg.exe
-```
-
----
-
-### ❌ No output file
-
-* Check if:
-
-```text
-separated/htdemucs/input/no_vocals.wav
-```
-
-exists before processing
-
----
-
-## 🔥 Future Improvements
-
-* 🎶 Automatic chorus detection (AI)
-* 🎧 MP3 export option
-* 📊 Progress display
-* 🖥️ GUI version
-
----
-
-## 📜 License
-
-MIT License
-
----
-
-## ⭐ Support
-
-If you find this useful, give it a ⭐ on GitHub!
+## Notes
+- First run downloads the htdemucs model (~80 MB) into `models/` automatically
+- Output is always 44100 Hz, stereo, 16-bit PCM WAV (1411 kbps)
+- Up to 2 songs can be processed simultaneously
