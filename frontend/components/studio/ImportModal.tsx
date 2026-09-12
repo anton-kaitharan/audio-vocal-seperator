@@ -252,6 +252,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onImp
                 />
               </div>
             </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '-8px' }}>
+              💡 Leave Trim Start & End empty to separate the <strong>entire full-length song</strong>.
+            </div>
 
             {message && (
               <div style={{

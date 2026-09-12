@@ -421,11 +421,21 @@ export default function TestRouterPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>
-                    Trim Start
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                      Trim Start
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => { setTestStart(''); setTestEnd(''); }}
+                      style={{ fontSize: '10px', color: 'var(--accent-purple)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    >
+                      Clear (Full Song)
+                    </button>
+                  </div>
                   <input
                     type="text"
+                    placeholder="00:00:00 (optional)"
                     value={testStart}
                     onChange={(e) => setTestStart(e.target.value)}
                     style={{
@@ -442,11 +452,21 @@ export default function TestRouterPage() {
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>
-                    Trim End
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                      Trim End
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => { setTestStart('00:00:10'); setTestEnd('00:00:30'); }}
+                      style={{ fontSize: '10px', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                    >
+                      20s Preview Clip
+                    </button>
+                  </div>
                   <input
                     type="text"
+                    placeholder="00:03:30 (optional)"
                     value={testEnd}
                     onChange={(e) => setTestEnd(e.target.value)}
                     style={{
@@ -462,6 +482,9 @@ export default function TestRouterPage() {
                     }}
                   />
                 </div>
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '-6px' }}>
+                💡 <strong>Duration Notice:</strong> Leaving Trim Start & End empty processes the <strong>complete full-length song</strong>. Entering timestamps trims the audio to only that segment.
               </div>
 
               <button

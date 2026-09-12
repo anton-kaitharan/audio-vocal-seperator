@@ -189,6 +189,8 @@ def run_with_progress(cmd, stage, logfile):
                 log(f"[yt-dlp] {line}", logfile)
 
         elif stage == "demucs":
+            if "unauthenticated requests" in line.lower():
+                continue
             log(f"[demucs] {line}", logfile)
 
         elif stage == "ffmpeg":
