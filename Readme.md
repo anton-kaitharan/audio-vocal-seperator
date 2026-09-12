@@ -19,10 +19,14 @@ YouTubeTools/
 ├── queue/            ← drop .txt job files here (auto-created)
 ├── processing/       ← jobs currently being processed (auto-created)
 ├── done/             ← completed job files (auto-created)
+├── failed/           ← failed job files with error logs (auto-created)
 ├── output/           ← final karoke WAV files saved here (auto-created)
 ├── logs/             ← per-job log files (auto-created)
 ├── models/           ← demucs AI models stored here (auto-created)
 ├── separated/        ← demucs temp output (auto-created, auto-cleaned)
+├── frontend/         ← Next.js 15 DAW Studio & SaaS web application
+├── server.py         ← FastAPI REST API backend
+├── SAAS_DEPLOYMENT_GUIDE.md ← production SaaS hosting roadmap
 │
 ├── yt-dlp.exe        ← download separately
 ├── ffmpeg/           ← download separately
