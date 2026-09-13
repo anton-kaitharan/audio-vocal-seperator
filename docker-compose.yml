@@ -1,0 +1,41 @@
+# ──────────────────────────────────────────────
+#  AuraVocal — Docker Compose (Development)
+# ──────────────────────────────────────────────
+
+services:
+  backend:
+    build: .
+    ports:
+      - "${PORT:-5000}:${PORT:-5000}"
+    environment:
+      - PORT=${PORT:-5000}
+      - BOT_TOKEN_ENV=${BOT_TOKEN_ENV:-}
+      - CHAT_ID_ENV=${CHAT_ID_ENV:-}
+      - ALLOWED_ID_ENV=${ALLOWED_ID_ENV:-}
+      - MODAL_API_URL=${MODAL_API_URL:-}
+    volumes:
+      - ./output:/app/output
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./queue:/app/queue
+      - ./done:/app/done
+      - ./failed:/app/failed
+      - ./models:/app/models
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-5000}/api/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:${PORT:-5000}
+    depends_on:
+      - backend
+    restart: unless-stopped

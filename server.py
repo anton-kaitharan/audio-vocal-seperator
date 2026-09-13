@@ -1,11 +1,12 @@
 import os
 import sys
 import re
+import time
 import subprocess
 import shutil
 import psutil
-from typing import Optional
-from fastapi import FastAPI, HTTPException, Query, BackgroundTasks
+from typing import Optional, List, Dict, Any
+from fastapi import FastAPI, HTTPException, Query, BackgroundTasks, UploadFile, File, Form
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -35,11 +36,12 @@ FAILED_DIR = os.path.join(BASE, "failed")
 OUTPUT_DIR = os.path.join(BASE, "output")
 LOGS_DIR = os.path.join(BASE, "logs")
 MODELS_DIR = os.path.join(BASE, "models")
+UPLOADS_DIR = os.path.join(BASE, "uploads")
 YTDLP_EXE = os.path.join(BASE, "yt-dlp.exe")
 if not os.path.exists(YTDLP_EXE):
     YTDLP_EXE = shutil.which("yt-dlp") or "yt-dlp"
 
-for d in [STATIC_DIR, QUEUE_DIR, PROCESSING_DIR, DONE_DIR, FAILED_DIR, OUTPUT_DIR, LOGS_DIR, MODELS_DIR]:
+for d in [STATIC_DIR, QUEUE_DIR, PROCESSING_DIR, DONE_DIR, FAILED_DIR, OUTPUT_DIR, LOGS_DIR, MODELS_DIR, UPLOADS_DIR]:
     os.makedirs(d, exist_ok=True)
 
 app = FastAPI(title="Karaoke Vocal Separator API")
@@ -70,6 +72,8 @@ def is_watcher_running() -> bool:
 
 def clean_url(url: str) -> str:
     url = url.strip()
+    if url.startswith("LOCAL:") or url.startswith("FILE:"):
+        return url
     m = re.search(r"(https?://(?:www\.|music\.)?youtube\.com/watch\?v=[^&]+)", url)
     if m:
         return m.group(1)
@@ -276,6 +280,55 @@ async def create_job(req: JobCreateRequest):
 
     return {"status": "queued", "filename": os.path.basename(target_path), "title": title}
 
+@app.post("/api/upload")
+async def upload_audio(
+    file: UploadFile = File(...),
+    title: Optional[str] = Form(None),
+    start: Optional[str] = Form(None),
+    end: Optional[str] = Form(None),
+):
+    """Direct audio upload endpoint for musicians & creators (MP3, WAV, FLAC, M4A, OGG)"""
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    allowed_exts = {".mp3", ".wav", ".m4a", ".flac", ".ogg", ".aac", ".wma"}
+    if ext not in allowed_exts:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format '{ext}'. Allowed: {', '.join(sorted(allowed_exts))}"
+        )
+
+    raw_title = title.strip() if (title and title.strip()) else os.path.splitext(file.filename or "track")[0]
+    safe_title = re.sub(r'[\\/*?:"<>|%&^$#]', "", raw_title).strip()
+    if not safe_title:
+        safe_title = "uploaded_track"
+
+    timestamp = int(time.time())
+    dest_filename = f"{timestamp}_{safe_title.replace(' ', '_')}{ext}"
+    dest_path = os.path.join(UPLOADS_DIR, dest_filename)
+
+    with open(dest_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    rel_path = f"uploads/{dest_filename}"
+    job_target = os.path.join(QUEUE_DIR, f"{safe_title.replace(' ', '_')}.txt")
+    counter = 1
+    while os.path.exists(job_target):
+        job_target = os.path.join(QUEUE_DIR, f"{safe_title.replace(' ', '_')}_{counter}.txt")
+        counter += 1
+
+    content = f"LOCAL:{rel_path}\n{safe_title}\n"
+    if start and end:
+        content += f"{start.strip()}\n{end.strip()}\n"
+
+    with open(job_target, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    return {
+        "status": "queued",
+        "filename": os.path.basename(job_target),
+        "title": safe_title,
+        "source": rel_path
+    }
+
 @app.delete("/api/jobs/{folder}/{filename}")
 def delete_job(folder: str, filename: str):
     allowed_folders = {"queue": QUEUE_DIR, "processing": PROCESSING_DIR, "done": DONE_DIR, "failed": FAILED_DIR}
@@ -301,15 +354,71 @@ def get_output_files():
         if f.endswith(".wav") or f.endswith(".mp3"):
             path = os.path.join(OUTPUT_DIR, f)
             stat = os.stat(path)
+            stem_type = "master"
+            if "_vocals." in f:
+                stem_type = "vocals"
+            elif "_instrumental." in f:
+                stem_type = "instrumental"
+            elif "_karoke." in f:
+                stem_type = "karaoke"
+
+            base_title = (
+                f.replace("_karoke.wav", "")
+                .replace("_karoke.mp3", "")
+                .replace("_instrumental.wav", "")
+                .replace("_instrumental.mp3", "")
+                .replace("_vocals.wav", "")
+                .replace("_vocals.mp3", "")
+                .replace("_", " ")
+            )
             files.append({
                 "filename": f,
-                "title": f.replace("_karoke.wav", "").replace("_karoke.mp3", "").replace("_", " "),
+                "title": base_title,
+                "stem_type": stem_type,
                 "size_mb": round(stat.st_size / (1024 * 1024), 2),
                 "mtime": stat.st_mtime,
                 "is_wav": f.endswith(".wav")
             })
     files.sort(key=lambda x: x["mtime"], reverse=True)
     return {"files": files}
+
+@app.get("/api/projects")
+def get_projects():
+    projects_map = {}
+    for f in os.listdir(OUTPUT_DIR):
+        if f.endswith(".wav") or f.endswith(".mp3"):
+            path = os.path.join(OUTPUT_DIR, f)
+            stat = os.stat(path)
+            base_name = f
+            stem_type = "master"
+            if "_vocals." in f:
+                stem_type = "vocals"
+                base_name = re.sub(r'_vocals\.(wav|mp3)$', '', f)
+            elif "_instrumental." in f:
+                stem_type = "instrumental"
+                base_name = re.sub(r'_instrumental\.(wav|mp3)$', '', f)
+            elif "_karoke." in f:
+                stem_type = "karaoke"
+                base_name = re.sub(r'_karoke\.(wav|mp3)$', '', f)
+
+            if base_name not in projects_map:
+                clean_name = base_name.replace("_", " ")
+                projects_map[base_name] = {
+                    "id": base_name,
+                    "title": clean_name,
+                    "mtime": stat.st_mtime,
+                    "stems": {},
+                    "audio_urls": {}
+                }
+
+            projects_map[base_name]["stems"][stem_type] = f
+            projects_map[base_name]["audio_urls"][stem_type] = f"/api/audio/{f}"
+            if stat.st_mtime > projects_map[base_name]["mtime"]:
+                projects_map[base_name]["mtime"] = stat.st_mtime
+
+    project_list = list(projects_map.values())
+    project_list.sort(key=lambda p: p["mtime"], reverse=True)
+    return {"projects": project_list}
 
 @app.get("/api/audio/{filename}")
 def stream_audio(filename: str):
@@ -382,8 +491,9 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 if __name__ == "__main__":
     import uvicorn
+    port = int(os.environ.get("PORT", 5000))
     print("=" * 50)
     print("  KARAOKE VOCAL SEPARATOR WEB DASHBOARD")
-    print(f"  Access UI at: http://localhost:5000")
+    print(f"  Access UI at: http://localhost:{port}")
     print("=" * 50)
-    uvicorn.run(app, host="0.0.0.0", port=5000, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")

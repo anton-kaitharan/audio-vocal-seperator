@@ -150,6 +150,8 @@ def clean_title(title):
 
 def clean_url(url):
     url = url.strip()
+    if url.startswith("LOCAL:") or url.startswith("FILE:"):
+        return url
     match = re.search(r"(https?://(?:www\.|music\.)?youtube\.com/watch\?v=[^&]+)", url)
     if match:
         return match.group(1)
@@ -236,37 +238,62 @@ def process_job(proc_path):
 
         input_wav   = os.path.join(BASE, f"{title}_input.wav")
         output_file = os.path.join(OUTPUT, f"{title}_karoke.wav")
+        output_inst = os.path.join(OUTPUT, f"{title}_instrumental.wav")
+        output_vocals = os.path.join(OUTPUT, f"{title}_vocals.wav")
 
         log(f"Title  : {title}", logfile)
-        log(f"URL    : {url}", logfile)
+        log(f"URL/Src: {url}", logfile)
         if start and end:
             log(f"Trim   : {start} -> {end}", logfile)
 
-        tg_send(f"Started: {title}\nDownloading...")
+        is_local_file = url.startswith("LOCAL:") or url.startswith("FILE:")
+        if is_local_file:
+            # DIRECT LOCAL AUDIO INGESTION
+            local_rel = url.split(":", 1)[1].strip()
+            local_path = os.path.join(BASE, local_rel) if not os.path.isabs(local_rel) else local_rel
+            log(f"Ingesting local uploaded audio: {local_path}", logfile)
+            if not os.path.exists(local_path):
+                log(f"ERROR: Local source audio file not found: {local_path}", logfile)
+                tg_send(f"ERROR: Local file missing for {title}")
+                return
 
-        # DOWNLOAD
-        log("Starting download...", logfile)
-        temp_template = os.path.join(BASE, f"{title}_input.%(ext)s")
+            tg_send(f"Started: {title}\nPreparing local audio...")
+            conv_cmd = [
+                FFMPEG, "-y",
+                "-i", local_path,
+                "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2",
+                input_wav
+            ]
+            c_res = subprocess.run(conv_cmd, capture_output=True, text=True)
+            if c_res.returncode != 0 or not os.path.exists(input_wav):
+                log(f"ERROR: Failed to prepare local audio: {c_res.stderr}", logfile)
+                tg_send(f"ERROR: Audio preparation failed for {title}")
+                return
+        else:
+            # YOUTUBE DOWNLOAD
+            tg_send(f"Started: {title}\nDownloading...")
+            log("Starting download...", logfile)
+            temp_template = os.path.join(BASE, f"{title}_input.%(ext)s")
 
-        ffmpeg_dir = os.path.dirname(FFMPEG) if (FFMPEG and os.path.exists(FFMPEG)) else ""
-        dl_cmd = [YTDLP, "--no-playlist"]
-        if shutil.which("node"):
-            dl_cmd.extend(["--js-runtimes", "node"])
-        if ffmpeg_dir and os.path.exists(ffmpeg_dir):
-            dl_cmd.extend(["--ffmpeg-location", ffmpeg_dir])
-        dl_cmd.extend([
-            "-f", "bestaudio",
-            "-x", "--audio-format", "wav",
-            "--retries", "3",
-            "-o", temp_template,
-            url
-        ])
+            ffmpeg_dir = os.path.dirname(FFMPEG) if (FFMPEG and os.path.exists(FFMPEG)) else ""
+            dl_cmd = [YTDLP, "--no-playlist"]
+            if shutil.which("node"):
+                dl_cmd.extend(["--js-runtimes", "node"])
+            if ffmpeg_dir and os.path.exists(ffmpeg_dir):
+                dl_cmd.extend(["--ffmpeg-location", ffmpeg_dir])
+            dl_cmd.extend([
+                "-f", "bestaudio",
+                "-x", "--audio-format", "wav",
+                "--retries", "3",
+                "-o", temp_template,
+                url
+            ])
 
-        ret = run_with_progress(dl_cmd, "download", logfile)
-        if ret != 0 or not os.path.exists(input_wav):
-            log(f"ERROR: Download failed (exit code {ret}).", logfile)
-            tg_send(f"ERROR: Download failed for {title}")
-            return
+            ret = run_with_progress(dl_cmd, "download", logfile)
+            if ret != 0 or not os.path.exists(input_wav):
+                log(f"ERROR: Download failed (exit code {ret}).", logfile)
+                tg_send(f"ERROR: Download failed for {title}")
+                return
 
         # Optimization: If start and end are provided, trim input before Demucs to save immense GPU/CPU time
         demucs_input = input_wav
@@ -287,7 +314,7 @@ def process_job(proc_path):
             else:
                 log(f"Trim notice: Fast trim skipped ({t_ret.stderr}), running full track separation.", logfile)
 
-        tg_send(f"{title}\nDownload done. Separating vocals...")
+        tg_send(f"{title}\nDownload done. Separating vocals & instrumental...")
 
         # DEMUCS
         log("Starting vocal separation...", logfile)
@@ -296,17 +323,18 @@ def process_job(proc_path):
 
         stem_name = os.path.splitext(os.path.basename(demucs_input))[0]
         sep_folder = os.path.join(SEPARATED, "htdemucs", stem_name)
-        source = os.path.join(sep_folder, "no_vocals.wav")
+        source_no_vocals = os.path.join(sep_folder, "no_vocals.wav")
+        source_vocals = os.path.join(sep_folder, "vocals.wav")
 
-        if not os.path.exists(source):
+        if not os.path.exists(source_no_vocals):
             log("ERROR: Demucs separation failed - no_vocals.wav not found.", logfile)
             tg_send(f"ERROR: Demucs failed for {title}")
             return
 
-        tg_send(f"{title}\nVocals removed. Processing audio...")
+        tg_send(f"{title}\nStems isolated. Mastering audio...")
 
         # FFMPEG - post-processing
-        log("Processing audio...", logfile)
+        log("Processing backing/karaoke audio...", logfile)
         af = (
             "silenceremove=start_periods=1:start_duration=0.5:start_threshold=-40dB,"
             "areverse,"
@@ -317,18 +345,35 @@ def process_job(proc_path):
         format_flags = ["-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2"]
 
         if start and end and demucs_input != trimmed_temp:
-            cmd = [FFMPEG, "-y", "-ss", start, "-to", end, "-i", source, "-af", af] + format_flags + [output_file]
+            cmd = [FFMPEG, "-y", "-ss", start, "-to", end, "-i", source_no_vocals, "-af", af] + format_flags + [output_file]
         else:
-            cmd = [FFMPEG, "-y", "-i", source, "-af", af] + format_flags + [output_file]
+            cmd = [FFMPEG, "-y", "-i", source_no_vocals, "-af", af] + format_flags + [output_file]
 
         run_with_progress(cmd, "ffmpeg", logfile)
 
         if not os.path.exists(output_file):
-            log("ERROR: FFmpeg post-processing failed.", logfile)
+            log("ERROR: FFmpeg post-processing failed for instrumental/karaoke.", logfile)
             tg_send(f"ERROR: FFmpeg failed for {title}")
             return
 
-        log(f"[OK] Saved: {output_file}", logfile)
+        # Also create instrumental copy for clarity
+        try:
+            shutil.copyfile(output_file, output_inst)
+        except Exception:
+            pass
+
+        # Also process vocals stem if present!
+        if os.path.exists(source_vocals):
+            log("Processing vocals audio stem...", logfile)
+            if start and end and demucs_input != trimmed_temp:
+                v_cmd = [FFMPEG, "-y", "-ss", start, "-to", end, "-i", source_vocals, "-af", af] + format_flags + [output_vocals]
+            else:
+                v_cmd = [FFMPEG, "-y", "-i", source_vocals, "-af", af] + format_flags + [output_vocals]
+            run_with_progress(v_cmd, "ffmpeg", logfile)
+            if os.path.exists(output_vocals):
+                log(f"[OK] Saved vocals: {output_vocals}", logfile)
+
+        log(f"[OK] Saved instrumental/karaoke: {output_file}", logfile)
         tg_send(f"Done processing: {title}\nSending file...")
         success = True
 

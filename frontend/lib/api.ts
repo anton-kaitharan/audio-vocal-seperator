@@ -76,3 +76,47 @@ export async function toggleWatcher(action: 'start' | 'stop') {
     return { status: 'error', error: err.message };
   }
 }
+
+export async function uploadAudioFile(
+  file: File,
+  title?: string,
+  start?: string,
+  end?: string
+): Promise<{ status: string; filename?: string; title?: string; error?: string }> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (title) formData.append('title', title);
+    if (start) formData.append('start', start);
+    if (end) formData.append('end', end);
+
+    const res = await fetch(`${BACKEND_URL}/api/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `Upload failed with status ${res.status}`);
+    }
+    return await res.json();
+  } catch (err: any) {
+    return { status: 'error', error: err.message || 'File upload failed' };
+  }
+}
+
+export async function fetchProjectsList(): Promise<{
+  projects: Array<{
+    id: string;
+    title: string;
+    mtime: number;
+    stems: Record<string, string>;
+    audio_urls: Record<string, string>;
+  }>;
+}> {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/projects`, { cache: 'no-store' });
+    return await res.json();
+  } catch {
+    return { projects: [] };
+  }
+}

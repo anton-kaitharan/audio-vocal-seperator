@@ -2,12 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Download, PlusCircle, Activity, Sliders } from 'lucide-react';
+import { Download, PlusCircle, Activity, Sliders, FolderOpen } from 'lucide-react';
 
 interface MacTitlebarProps {
   projectTitle: string;
   onImportClick: () => void;
   onExportClick: () => void;
+  onLibraryClick?: () => void;
   activeRoute?: 'studio' | 'test' | 'landing';
 }
 
@@ -15,6 +16,7 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
   projectTitle,
   onImportClick,
   onExportClick,
+  onLibraryClick,
   activeRoute = 'studio'
 }) => {
   return (
@@ -111,6 +113,30 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
 
       {/* Right Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {onLibraryClick && (
+          <button
+            onClick={onLibraryClick}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 500,
+              background: '#ffffff',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-light)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+              transition: 'all 0.15s'
+            }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = '#0284c7')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-light)')}
+          >
+            <FolderOpen size={14} color="#0284c7" />
+            <span>Library</span>
+          </button>
+        )}
         <button
           onClick={onImportClick}
           style={{
