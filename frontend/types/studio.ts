@@ -1,7 +1,7 @@
 export interface StemTrack {
   id: string;
   name: string;
-  type: 'vocals' | 'backing' | 'drums' | 'bass' | 'master';
+  type: 'vocals' | 'backing' | 'drums' | 'bass' | 'other' | 'instrumental' | 'karaoke' | 'master';
   color: string; // e.g. '#8b5cf6', '#a855f7', '#f97316', '#06b6d4'
   muted: boolean;
   soloed: boolean;

@@ -10,6 +10,9 @@ interface MacTitlebarProps {
   onExportClick: () => void;
   onLibraryClick?: () => void;
   activeRoute?: 'studio' | 'test' | 'landing';
+  viewMode?: string;
+  onToggleViewMode?: () => void;
+  onNewProject?: () => void;
 }
 
 export const MacTitlebar: React.FC<MacTitlebarProps> = ({
@@ -17,7 +20,10 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
   onImportClick,
   onExportClick,
   onLibraryClick,
-  activeRoute = 'studio'
+  activeRoute = 'studio',
+  viewMode,
+  onToggleViewMode,
+  onNewProject
 }) => {
   return (
     <header style={{
@@ -113,6 +119,30 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
 
       {/* Right Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {onToggleViewMode && (
+          <button
+            onClick={onToggleViewMode}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 600,
+              background: viewMode === 'advanced_studio' ? 'rgba(124, 58, 237, 0.1)' : '#ffffff',
+              color: 'var(--accent-purple)',
+              border: '1px solid rgba(124, 58, 237, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.15s'
+            }}
+            title={viewMode === 'advanced_studio' ? 'Return to Stem Mixer' : 'Switch to full DAW'}
+          >
+            <Sliders size={13} />
+            <span>{viewMode === 'advanced_studio' ? 'Simple Mixer' : 'Advanced Studio'}</span>
+          </button>
+        )}
+
         {onLibraryClick && (
           <button
             onClick={onLibraryClick}

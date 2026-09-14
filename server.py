@@ -5,9 +5,11 @@ import time
 import subprocess
 import shutil
 import psutil
+import io
+import zipfile
 from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, HTTPException, Query, BackgroundTasks, UploadFile, File, Form
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -400,6 +402,15 @@ def get_projects():
             elif "_karoke." in f:
                 stem_type = "karaoke"
                 base_name = re.sub(r'_karoke\.(wav|mp3)$', '', f)
+            elif "_drums." in f:
+                stem_type = "drums"
+                base_name = re.sub(r'_drums\.(wav|mp3)$', '', f)
+            elif "_bass." in f:
+                stem_type = "bass"
+                base_name = re.sub(r'_bass\.(wav|mp3)$', '', f)
+            elif "_other." in f:
+                stem_type = "other"
+                base_name = re.sub(r'_other\.(wav|mp3)$', '', f)
 
             if base_name not in projects_map:
                 clean_name = base_name.replace("_", " ")
@@ -419,6 +430,39 @@ def get_projects():
     project_list = list(projects_map.values())
     project_list.sort(key=lambda p: p["mtime"], reverse=True)
     return {"projects": project_list}
+
+@app.get("/api/projects/{project_id}/zip")
+def download_project_zip(project_id: str):
+    clean_id = os.path.basename(project_id).strip()
+    files_to_zip = []
+    for f in os.listdir(OUTPUT_DIR):
+        if (f.endswith(".wav") or f.endswith(".mp3")) and f.startswith(clean_id):
+            files_to_zip.append(f)
+            
+    if not files_to_zip:
+        # Fallback search by title prefix
+        prefix = clean_id.replace(" ", "_")
+        for f in os.listdir(OUTPUT_DIR):
+            if (f.endswith(".wav") or f.endswith(".mp3")) and f.startswith(prefix):
+                files_to_zip.append(f)
+
+    if not files_to_zip:
+        raise HTTPException(status_code=404, detail="No stems found for this project")
+
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        for f in sorted(set(files_to_zip)):
+            p = os.path.join(OUTPUT_DIR, f)
+            if os.path.exists(p):
+                zf.write(p, arcname=f)
+
+    zip_buffer.seek(0)
+    safe_filename = f"{clean_id}_stems.zip".replace(" ", "_")
+    return StreamingResponse(
+        zip_buffer,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{safe_filename}"'}
+    )
 
 @app.get("/api/audio/{filename}")
 def stream_audio(filename: str):

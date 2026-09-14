@@ -120,3 +120,107 @@ export async function fetchProjectsList(): Promise<{
     return { projects: [] };
   }
 }
+
+export function getProjectZipUrl(projectId: string): string {
+  return `${BACKEND_URL}/api/projects/${encodeURIComponent(projectId)}/zip`;
+}
+
+export interface JobProgressInfo {
+  stage: 'queued' | 'downloading' | 'separating' | 'mastering' | 'completed' | 'failed';
+  percent?: number;
+  message: string;
+  stageIndex: number; // 0: download/ingest, 1: demucs separate, 2: master/export, 3: completed
+}
+
+export function parseLogProgress(log: string, hasFailed?: boolean, isDone?: boolean): JobProgressInfo {
+  if (isDone) {
+    return {
+      stage: 'completed',
+      percent: 100,
+      message: 'Separation and mastering completed successfully.',
+      stageIndex: 3
+    };
+  }
+
+  if (hasFailed || (log && log.includes('ERROR:'))) {
+    const errMatch = log.match(/ERROR:\s*(.+)/);
+    return {
+      stage: 'failed',
+      message: errMatch ? errMatch[1].trim() : 'An error occurred during separation.',
+      stageIndex: 0
+    };
+  }
+
+  if (!log || log.trim().length === 0 || log.includes('No log generated yet')) {
+    return {
+      stage: 'queued',
+      message: 'Queued in processing queue...',
+      stageIndex: 0
+    };
+  }
+
+  // Check from most advanced stage to earliest
+  if (log.includes('Done processing:') || log.includes('Saved instrumental/karaoke') || log.includes('Sending file')) {
+    return {
+      stage: 'completed',
+      percent: 100,
+      message: 'All stems mastered and ready.',
+      stageIndex: 3
+    };
+  }
+
+  if (
+    log.includes('Mastering audio') ||
+    log.includes('Processing backing/karaoke') ||
+    log.includes('Processing vocals audio stem') ||
+    log.includes('[ffmpeg]')
+  ) {
+    return {
+      stage: 'mastering',
+      percent: 85,
+      message: 'Mastering & normalizing audio stems (FFmpeg)...',
+      stageIndex: 2
+    };
+  }
+
+  if (
+    log.includes('Separating vocals') ||
+    log.includes('Starting vocal separation') ||
+    log.includes('[demucs]') ||
+    log.includes('htdemucs')
+  ) {
+    // Try to extract demucs progress percentage if available
+    const demucsMatch = log.match(/(\d{1,3})%\|/);
+    const pct = demucsMatch ? Math.min(95, Math.max(10, parseInt(demucsMatch[1], 10))) : 50;
+    return {
+      stage: 'separating',
+      percent: pct,
+      message: `Demucs AI neural network isolating stems... ${pct > 10 ? `(${pct}%)` : ''}`,
+      stageIndex: 1
+    };
+  }
+
+  if (
+    log.includes('Starting download') ||
+    log.includes('Downloading...') ||
+    log.includes('[yt-dlp]') ||
+    log.includes('Ingesting local') ||
+    log.includes('Preparing local audio')
+  ) {
+    const dlMatch = log.match(/Downloading\.\.\.\s*(\d{1,3}(?:\.\d+)?)%/);
+    const pct = dlMatch ? parseFloat(dlMatch[1]) : 20;
+    return {
+      stage: 'downloading',
+      percent: Math.min(99, pct),
+      message: dlMatch ? `Downloading audio source... ${dlMatch[1]}%` : 'Ingesting audio stream...',
+      stageIndex: 0
+    };
+  }
+
+  return {
+    stage: 'downloading',
+    message: 'Initializing AI audio pipeline...',
+    stageIndex: 0
+  };
+}
+
