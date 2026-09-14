@@ -276,18 +276,24 @@ def process_job(proc_path):
             temp_template = os.path.join(BASE, f"{title}_input.%(ext)s")
 
             ffmpeg_dir = os.path.dirname(FFMPEG) if (FFMPEG and os.path.exists(FFMPEG)) else ""
-            dl_cmd = [YTDLP, "--no-playlist"]
-            if shutil.which("node"):
-                dl_cmd.extend(["--js-runtimes", "node"])
-            if ffmpeg_dir and os.path.exists(ffmpeg_dir):
-                dl_cmd.extend(["--ffmpeg-location", ffmpeg_dir])
-            dl_cmd.extend([
-                "-f", "bestaudio",
+            dl_cmd = [
+                YTDLP,
+                "--no-playlist",
+                "--no-check-certificates",
+                "--retries", "5",
+                "--fragment-retries", "5",
+                "--extractor-args", "youtube:player_client=android,web",
+                "-f", "ba/b/bestaudio/best",
                 "-x", "--audio-format", "wav",
-                "--retries", "3",
+                "--retries", "5",
                 "-o", temp_template,
                 url
-            ])
+            ]
+            node_bin = shutil.which("node")
+            if node_bin:
+                dl_cmd.extend(["--js-runtimes", f"node:{node_bin}"])
+            if ffmpeg_dir and os.path.exists(ffmpeg_dir):
+                dl_cmd.extend(["--ffmpeg-location", ffmpeg_dir])
 
             ret = run_with_progress(dl_cmd, "download", logfile)
             if ret != 0 or not os.path.exists(input_wav):
@@ -325,6 +331,15 @@ def process_job(proc_path):
         sep_folder = os.path.join(SEPARATED, "htdemucs", stem_name)
         source_no_vocals = os.path.join(sep_folder, "no_vocals.wav")
         source_vocals = os.path.join(sep_folder, "vocals.wav")
+
+        # Dynamic fallback search if exact folder name has variations
+        if not os.path.exists(source_no_vocals) and os.path.exists(SEPARATED):
+            for root, dirs, files in os.walk(SEPARATED):
+                if "no_vocals.wav" in files and stem_name.lower() in root.lower():
+                    sep_folder = root
+                    source_no_vocals = os.path.join(sep_folder, "no_vocals.wav")
+                    source_vocals = os.path.join(sep_folder, "vocals.wav")
+                    break
 
         if not os.path.exists(source_no_vocals):
             log("ERROR: Demucs separation failed - no_vocals.wav not found.", logfile)

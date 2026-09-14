@@ -167,9 +167,15 @@ def get_youtube_metadata(url: str = Query(...)):
     if not ("youtube.com" in url or "youtu.be" in url):
         raise HTTPException(status_code=400, detail="Invalid YouTube URL")
     try:
-        cmd = [YTDLP_EXE, "--no-playlist"]
-        if shutil.which("node"):
-            cmd.extend(["--js-runtimes", "node"])
+        cmd = [
+            YTDLP_EXE,
+            "--no-playlist",
+            "--no-check-certificates",
+            "--extractor-args", "youtube:player_client=android,web"
+        ]
+        node_bin = shutil.which("node")
+        if node_bin:
+            cmd.extend(["--js-runtimes", f"node:{node_bin}"])
         cmd.extend(["--print", "title", "--print", "duration_string", url])
         res = subprocess.run(
             cmd,
