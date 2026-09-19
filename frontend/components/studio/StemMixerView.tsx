@@ -176,14 +176,14 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
       flex: 1,
       display: 'flex',
       flexDirection: 'column',
-      background: '#ffffff',
+      background: 'var(--color-bg-main)',
       overflow: 'hidden'
     }}>
       {/* Top Banner: Project Title, Quick Stats, Actions */}
       <div style={{
         padding: '16px 28px',
-        borderBottom: '1px solid var(--border-subtle)',
-        background: '#fafbfc',
+        borderBottom: '1px solid var(--color-border)',
+        background: 'var(--color-surface)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -194,32 +194,32 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
             width: '40px',
             height: '40px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
+            background: 'linear-gradient(135deg, var(--color-primary), #90cb18)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(124, 58, 237, 0.25)'
+            boxShadow: '0 2px 10px rgba(185, 240, 59, 0.3)'
           }}>
-            <Music size={20} color="#ffffff" />
+            <Music size={20} color="#0E0E0E" />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
+              <h1 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.3px' }}>
                 {projectTitle}
               </h1>
               <span style={{
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#059669',
-                background: '#ecfdf5',
+                color: '#10b981',
+                background: 'rgba(16, 185, 129, 0.15)',
                 padding: '2px 8px',
                 borderRadius: '9999px',
-                border: '1px solid #a7f3d0'
+                border: '1px solid rgba(16, 185, 129, 0.3)'
               }}>
                 Ready • {tracks.length} Stems
               </span>
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
               Isolated with Demucs v4 AI • Mastered 44.1kHz 16-bit
             </div>
           </div>
@@ -232,19 +232,19 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
             style={{
               padding: '8px 14px',
               borderRadius: '8px',
-              border: '1px solid var(--border-light)',
-              background: '#ffffff',
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-surface-elevated)',
               fontSize: '12px',
               fontWeight: 600,
-              color: 'var(--text-primary)',
+              color: 'var(--color-text-primary)',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
               cursor: 'pointer'
             }}
           >
-            <PlusCircle size={14} color="var(--accent-purple)" />
+            <PlusCircle size={14} color="var(--color-primary)" />
             <span>New Separation</span>
           </button>
 
@@ -253,19 +253,19 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
             style={{
               padding: '8px 14px',
               borderRadius: '8px',
-              border: '1px solid var(--border-light)',
-              background: '#ffffff',
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-surface-elevated)',
               fontSize: '12px',
               fontWeight: 600,
-              color: 'var(--text-primary)',
+              color: 'var(--color-text-primary)',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
               cursor: 'pointer'
             }}
           >
-            <FolderOpen size={14} color="#0284c7" />
+            <FolderOpen size={14} color="var(--color-primary)" />
             <span>Library</span>
           </button>
 
@@ -296,9 +296,9 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
             style={{
               padding: '8px 14px',
               borderRadius: '8px',
-              background: 'rgba(124, 58, 237, 0.08)',
-              border: '1px solid rgba(124, 58, 237, 0.25)',
-              color: 'var(--accent-purple)',
+              background: 'rgba(185, 240, 59, 0.12)',
+              border: '1px solid rgba(185, 240, 59, 0.3)',
+              color: 'var(--color-primary)',
               fontSize: '12px',
               fontWeight: 700,
               display: 'flex',
@@ -307,8 +307,8 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
               cursor: 'pointer',
               transition: 'all 0.15s'
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(124, 58, 237, 0.15)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(124, 58, 237, 0.08)')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(185, 240, 59, 0.2)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(185, 240, 59, 0.12)')}
           >
             <Sliders size={14} />
             <span>Open in Advanced Studio</span>
@@ -319,8 +319,8 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
       {/* Master Transport Bar */}
       <div style={{
         padding: '12px 28px',
-        borderBottom: '1px solid var(--border-subtle)',
-        background: '#ffffff',
+        borderBottom: '1px solid var(--color-border)',
+        background: 'var(--color-surface)',
         display: 'flex',
         alignItems: 'center',
         gap: '24px'
@@ -332,17 +332,17 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
             width: '42px',
             height: '42px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
-            color: '#ffffff',
+            background: 'linear-gradient(135deg, var(--color-primary), #90cb18)',
+            color: '#0E0E0E',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px var(--accent-purple-glow)',
+            boxShadow: '0 2px 10px rgba(185, 240, 59, 0.3)',
             cursor: 'pointer',
             flexShrink: 0
           }}
         >
-          {isPlaying ? <Pause size={18} fill="#fff" /> : <Play size={18} fill="#fff" style={{ marginLeft: '2px' }} />}
+          {isPlaying ? <Pause size={18} fill="#0E0E0E" color="#0E0E0E" /> : <Play size={18} fill="#0E0E0E" color="#0E0E0E" style={{ marginLeft: '2px' }} />}
         </button>
 
         {/* Time Stamp */}
@@ -350,12 +350,12 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
           fontFamily: 'var(--font-mono)',
           fontSize: '13px',
           fontWeight: 600,
-          color: 'var(--text-primary)',
+          color: 'var(--color-text-primary)',
           minWidth: '100px'
         }}>
           <span>{formatTime(currentTime)}</span>
-          <span style={{ color: 'var(--text-muted)', margin: '0 4px' }}>/</span>
-          <span style={{ color: 'var(--text-muted)' }}>{formatTime(duration)}</span>
+          <span style={{ color: 'var(--color-text-secondary)', margin: '0 4px' }}>/</span>
+          <span style={{ color: 'var(--color-text-secondary)' }}>{formatTime(duration)}</span>
         </div>
 
         {/* Master Progress Slider */}
@@ -373,7 +373,7 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
 
         {/* Master Volume */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '150px' }}>
-          <Volume2 size={16} color="var(--text-muted)" />
+          <Volume2 size={16} color="var(--color-text-secondary)" />
           <input
             type="range"
             min={0}
@@ -383,7 +383,7 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
             onChange={e => onMasterVolumeChange(parseFloat(e.target.value))}
             style={{ width: '80px', cursor: 'pointer' }}
           />
-          <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', width: '32px' }}>
+          <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)', width: '32px' }}>
             {Math.round(masterVolume * 100)}%
           </span>
         </div>
@@ -397,21 +397,21 @@ export const StemMixerView: React.FC<StemMixerViewProps> = ({
         display: 'flex',
         flexDirection: 'column',
         gap: '14px',
-        background: '#f8fafc'
+        background: 'var(--color-bg-main)'
       }}>
         {tracks.map((track) => {
           return (
             <div
               key={track.id}
               style={{
-                background: '#ffffff',
-                border: '1px solid var(--border-subtle)',
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '12px',
                 padding: '14px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '20px',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
                 opacity: track.muted ? 0.65 : 1,
                 transition: 'all 0.15s ease'
               }}

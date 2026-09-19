@@ -36,8 +36,8 @@ export const TransportBar: React.FC<TransportBarProps> = ({
   return (
     <div style={{
       height: '54px',
-      background: '#ffffff',
-      borderTop: '1px solid var(--border-subtle)',
+      background: 'var(--color-surface)',
+      borderTop: '1px solid var(--color-border)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -51,32 +51,32 @@ export const TransportBar: React.FC<TransportBarProps> = ({
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          background: '#f8fafc',
-          border: '1px solid var(--border-light)',
+          background: 'var(--color-surface-elevated)',
+          border: '1px solid var(--color-border)',
           padding: '4px 10px',
           borderRadius: '6px',
           fontSize: '11px',
           fontFamily: 'var(--font-mono)'
         }}>
-          <Disc3 size={13} color="var(--accent-purple)" />
-          <span style={{ color: 'var(--text-muted)' }}>BPM:</span>
-          <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{bpm}</span>
+          <Disc3 size={13} color="var(--color-primary)" />
+          <span style={{ color: 'var(--color-text-secondary)' }}>BPM:</span>
+          <span style={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>{bpm}</span>
         </div>
 
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          background: '#f8fafc',
-          border: '1px solid var(--border-light)',
+          background: 'var(--color-surface-elevated)',
+          border: '1px solid var(--color-border)',
           padding: '4px 10px',
           borderRadius: '6px',
           fontSize: '11px',
           fontFamily: 'var(--font-mono)'
         }}>
-          <Radio size={13} color="#0284c7" />
-          <span style={{ color: 'var(--text-muted)' }}>KEY:</span>
-          <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{keySignature}</span>
+          <Radio size={13} color="#06b6d4" />
+          <span style={{ color: 'var(--color-text-secondary)' }}>KEY:</span>
+          <span style={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>{keySignature}</span>
         </div>
       </div>
 
@@ -91,9 +91,9 @@ export const TransportBar: React.FC<TransportBarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--text-secondary)',
-            background: '#f8fafc',
-            border: '1px solid var(--border-light)'
+            color: 'var(--color-text-secondary)',
+            background: 'var(--color-surface-elevated)',
+            border: '1px solid var(--color-border)'
           }}
           title="Rewind 5s"
         >
@@ -109,14 +109,14 @@ export const TransportBar: React.FC<TransportBarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'var(--accent-purple)',
-            color: '#fff',
-            boxShadow: '0 2px 10px var(--accent-purple-glow)',
+            background: 'var(--color-primary)',
+            color: '#0E0E0E',
+            boxShadow: '0 2px 12px rgba(185, 240, 59, 0.3)',
             transition: 'transform 0.1s ease'
           }}
           title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
         >
-          {isPlaying ? <Pause size={18} fill="#fff" /> : <Play size={18} fill="#fff" style={{ marginLeft: '2px' }} />}
+          {isPlaying ? <Pause size={18} fill="#0E0E0E" color="#0E0E0E" /> : <Play size={18} fill="#0E0E0E" color="#0E0E0E" style={{ marginLeft: '2px' }} />}
         </button>
 
         <button
@@ -128,9 +128,9 @@ export const TransportBar: React.FC<TransportBarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--text-secondary)',
-            background: '#f8fafc',
-            border: '1px solid var(--border-light)'
+            color: 'var(--color-text-secondary)',
+            background: 'var(--color-surface-elevated)',
+            border: '1px solid var(--color-border)'
           }}
           title="Fast Forward 5s"
         >
@@ -140,18 +140,18 @@ export const TransportBar: React.FC<TransportBarProps> = ({
         {/* Time Display */}
         <div style={{
           marginLeft: '12px',
-          background: '#f8fafc',
-          border: '1px solid var(--border-light)',
+          background: 'var(--color-surface-elevated)',
+          border: '1px solid var(--color-border)',
           padding: '4px 12px',
           borderRadius: '6px',
           fontFamily: 'var(--font-mono)',
           fontSize: '12px',
           letterSpacing: '0.5px',
-          color: 'var(--text-primary)'
+          color: 'var(--color-text-primary)'
         }}>
-          <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{formatSeconds(currentTime)}</span>
-          <span style={{ color: 'var(--text-muted)', margin: '0 6px' }}>/</span>
-          <span style={{ color: 'var(--text-muted)' }}>{formatSeconds(duration)}</span>
+          <span style={{ color: 'var(--color-text-primary)', fontWeight: 700 }}>{formatSeconds(currentTime)}</span>
+          <span style={{ color: 'var(--color-text-secondary)', margin: '0 6px' }}>/</span>
+          <span style={{ color: 'var(--color-text-secondary)' }}>{formatSeconds(duration)}</span>
         </div>
       </div>
 

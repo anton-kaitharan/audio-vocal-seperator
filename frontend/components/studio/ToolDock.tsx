@@ -21,8 +21,8 @@ export const ToolDock: React.FC<ToolDockProps> = ({ activeTool, onSelectTool }) 
     <aside style={{
       width: '56px',
       height: '100%',
-      background: '#ffffff',
-      borderRight: '1px solid var(--border-subtle)',
+      background: 'var(--color-surface)',
+      borderRight: '1px solid var(--color-border)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -36,14 +36,14 @@ export const ToolDock: React.FC<ToolDockProps> = ({ activeTool, onSelectTool }) 
         width: '36px',
         height: '36px',
         borderRadius: '8px',
-        background: '#f8fafc',
-        border: '1px solid var(--border-light)',
+        background: 'var(--color-surface-elevated)',
+        border: '1px solid var(--color-border)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: '8px'
       }} title="AuraVocal Studio">
-        <Disc size={20} color="var(--accent-purple)" />
+        <Disc size={20} color="var(--color-primary)" />
       </div>
 
       {/* Tool Icons */}
@@ -63,20 +63,20 @@ export const ToolDock: React.FC<ToolDockProps> = ({ activeTool, onSelectTool }) 
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: isActive ? 'var(--accent-purple)' : 'transparent',
-                color: isActive ? '#ffffff' : 'var(--text-secondary)',
-                boxShadow: isActive ? '0 2px 8px var(--accent-purple-glow)' : 'none',
+                background: isActive ? 'var(--color-primary)' : 'transparent',
+                color: isActive ? '#0E0E0E' : 'var(--color-text-secondary)',
+                boxShadow: isActive ? '0 2px 10px rgba(185, 240, 59, 0.3)' : 'none',
                 transition: 'all 0.15s ease'
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.color = 'var(--text-primary)';
-                  e.currentTarget.style.background = '#f1f5f9';
+                  e.currentTarget.style.color = 'var(--color-text-primary)';
+                  e.currentTarget.style.background = 'var(--color-surface-elevated)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
                   e.currentTarget.style.background = 'transparent';
                 }
               }}

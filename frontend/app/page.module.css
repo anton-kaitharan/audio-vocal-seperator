@@ -1,13 +1,13 @@
 .page {
-  --background: #fafafa;
-  --foreground: #fff;
+  --background: var(--color-bg-main, #0E0E0E);
+  --foreground: var(--color-surface, #1C1C1E);
 
-  --text-primary: #000;
-  --text-secondary: #666;
+  --text-primary: var(--color-text-primary, #FFFFFF);
+  --text-secondary: var(--color-text-secondary, #8E8E93);
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
+  --button-primary-hover: var(--color-surface-elevated, #2C2C2E);
+  --button-secondary-hover: var(--color-surface-elevated, #2C2C2E);
+  --button-secondary-border: var(--color-border, #3A3A3C);
 
   display: flex;
   flex: 1;

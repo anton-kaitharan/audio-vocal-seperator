@@ -34,7 +34,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       padding: '40px 24px',
-      background: 'radial-gradient(ellipse at 50% 15%, rgba(124, 58, 237, 0.05) 0%, #ffffff 70%)',
+      background: 'radial-gradient(ellipse at 50% 15%, rgba(185, 240, 59, 0.06) 0%, var(--color-bg-main) 70%)',
       overflowY: 'auto'
     }}>
       {/* Header Tagline */}
@@ -45,9 +45,9 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
           gap: '8px',
           padding: '6px 14px',
           borderRadius: '9999px',
-          background: 'rgba(124, 58, 237, 0.08)',
-          border: '1px solid rgba(124, 58, 237, 0.2)',
-          color: 'var(--accent-purple)',
+          background: 'rgba(185, 240, 59, 0.12)',
+          border: '1px solid rgba(185, 240, 59, 0.3)',
+          color: 'var(--color-primary)',
           fontSize: '12px',
           fontWeight: 600,
           marginBottom: '16px'
@@ -59,7 +59,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
         <h1 style={{
           fontSize: '34px',
           fontWeight: 800,
-          color: 'var(--text-primary)',
+          color: 'var(--color-text-primary)',
           letterSpacing: '-0.8px',
           lineHeight: 1.2,
           marginBottom: '12px'
@@ -69,7 +69,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
 
         <p style={{
           fontSize: '15px',
-          color: 'var(--text-secondary)',
+          color: 'var(--color-text-secondary)',
           lineHeight: 1.5
         }}>
           Isolate pristine studio vocals, instrumental backing, drums, and bass stems in seconds.
@@ -90,8 +90,8 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
           onClick={onSelectYouTube}
           style={{
             position: 'relative',
-            background: '#ffffff',
-            border: '1.5px solid var(--border-subtle)',
+            background: 'var(--color-surface)',
+            border: '1.5px solid var(--color-border)',
             borderRadius: '16px',
             padding: '32px 26px',
             display: 'flex',
@@ -99,30 +99,30 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
             alignItems: 'flex-start',
             textAlign: 'left',
             cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
             transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = '#ef4444';
             e.currentTarget.style.transform = 'translateY(-3px)';
-            e.currentTarget.style.boxShadow = '0 12px 30px rgba(239, 68, 68, 0.12)';
+            e.currentTarget.style.boxShadow = '0 12px 30px rgba(239, 68, 68, 0.2)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.borderColor = 'var(--color-border)';
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.4)';
           }}
         >
           <div style={{
             width: '52px',
             height: '52px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #fee2e2, #fecaca)',
+            background: 'rgba(239, 68, 68, 0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '20px',
-            border: '1px solid #fca5a5'
+            border: '1px solid rgba(239, 68, 68, 0.3)'
           }}>
             <Video size={26} color="#ef4444" />
           </div>
@@ -143,7 +143,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
           <h2 style={{
             fontSize: '20px',
             fontWeight: 700,
-            color: 'var(--text-primary)',
+            color: 'var(--color-text-primary)',
             marginBottom: '8px'
           }}>
             YouTube Link
@@ -151,7 +151,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
 
           <p style={{
             fontSize: '13px',
-            color: 'var(--text-muted)',
+            color: 'var(--color-text-secondary)',
             lineHeight: 1.5,
             marginBottom: '24px',
             flex: 1
@@ -165,7 +165,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
             justifyContent: 'space-between',
             width: '100%',
             paddingTop: '16px',
-            borderTop: '1px solid #f1f5f9'
+            borderTop: '1px solid var(--color-border)'
           }}>
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#ef4444' }}>
               Paste URL & proceed
@@ -174,7 +174,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: '#fee2e2',
+              background: 'rgba(239, 68, 68, 0.15)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -189,8 +189,8 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
           onClick={onSelectUpload}
           style={{
             position: 'relative',
-            background: '#ffffff',
-            border: '1.5px solid var(--border-subtle)',
+            background: 'var(--color-surface)',
+            border: '1.5px solid var(--color-border)',
             borderRadius: '16px',
             padding: '32px 26px',
             display: 'flex',
@@ -198,32 +198,32 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
             alignItems: 'flex-start',
             textAlign: 'left',
             cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
             transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--accent-purple)';
+            e.currentTarget.style.borderColor = 'var(--color-primary)';
             e.currentTarget.style.transform = 'translateY(-3px)';
-            e.currentTarget.style.boxShadow = '0 12px 30px rgba(124, 58, 237, 0.12)';
+            e.currentTarget.style.boxShadow = '0 12px 30px rgba(185, 240, 59, 0.2)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.borderColor = 'var(--color-border)';
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.4)';
           }}
         >
           <div style={{
             width: '52px',
             height: '52px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #ede9fe, #ddd6fe)',
+            background: 'rgba(185, 240, 59, 0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '20px',
-            border: '1px solid #c4b5fd'
+            border: '1px solid rgba(185, 240, 59, 0.3)'
           }}>
-            <UploadCloud size={26} color="var(--accent-purple)" />
+            <UploadCloud size={26} color="var(--color-primary)" />
           </div>
 
           <div style={{
@@ -233,7 +233,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.8px',
-            color: 'var(--accent-purple)',
+            color: 'var(--color-primary)',
             marginBottom: '6px'
           }}>
             Local Audio
@@ -242,7 +242,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
           <h2 style={{
             fontSize: '20px',
             fontWeight: 700,
-            color: 'var(--text-primary)',
+            color: 'var(--color-text-primary)',
             marginBottom: '8px'
           }}>
             Upload Audio File
@@ -250,7 +250,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
 
           <p style={{
             fontSize: '13px',
-            color: 'var(--text-muted)',
+            color: 'var(--color-text-secondary)',
             lineHeight: 1.5,
             marginBottom: '24px',
             flex: 1
@@ -264,21 +264,21 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
             justifyContent: 'space-between',
             width: '100%',
             paddingTop: '16px',
-            borderTop: '1px solid #f1f5f9'
+            borderTop: '1px solid var(--color-border)'
           }}>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--accent-purple)' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-primary)' }}>
               Drag & drop file
             </span>
             <div style={{
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: '#ede9fe',
+              background: 'rgba(185, 240, 59, 0.15)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <ArrowRight size={14} color="var(--accent-purple)" />
+              <ArrowRight size={14} color="var(--color-primary)" />
             </div>
           </div>
         </button>
@@ -289,8 +289,8 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
         <div style={{
           width: '100%',
           maxWidth: '720px',
-          background: '#f8fafc',
-          border: '1px solid var(--border-subtle)',
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
           borderRadius: '12px',
           padding: '16px 20px',
           display: 'flex',
@@ -302,7 +302,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
               <Clock size={14} />
               <span>Recently Separated Songs</span>
             </div>
@@ -312,7 +312,7 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
                 style={{
                   fontSize: '12px',
                   fontWeight: 600,
-                  color: 'var(--accent-purple)',
+                  color: 'var(--color-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px'
@@ -336,8 +336,8 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
                 onClick={() => onOpenProject?.(p)}
                 style={{
                   flex: '0 0 auto',
-                  background: '#ffffff',
-                  border: '1px solid var(--border-light)',
+                  background: 'var(--color-surface-elevated)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '8px',
                   padding: '8px 12px',
                   display: 'flex',
@@ -345,21 +345,21 @@ export const SourceSelectView: React.FC<SourceSelectViewProps> = ({
                   gap: '8px',
                   fontSize: '12px',
                   fontWeight: 500,
-                  color: 'var(--text-primary)',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                  color: 'var(--color-text-primary)',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
                   transition: 'all 0.15s'
                 }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent-purple)')}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-light)')}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--color-primary)')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--color-border)')}
               >
-                <Disc size={14} color="var(--accent-purple)" />
+                <Disc size={14} color="var(--color-primary)" />
                 <span style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {p.title}
                 </span>
                 <span style={{
                   fontSize: '10px',
-                  background: 'rgba(124, 58, 237, 0.08)',
-                  color: 'var(--accent-purple)',
+                  background: 'rgba(185, 240, 59, 0.15)',
+                  color: 'var(--color-primary)',
                   padding: '2px 6px',
                   borderRadius: '4px',
                   fontWeight: 600

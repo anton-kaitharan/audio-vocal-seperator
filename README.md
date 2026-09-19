@@ -1,6 +1,6 @@
-# YouTube Karoke Maker
+# YouTube Karaoke Maker
 
-Removes vocals from any YouTube video and saves a karoke WAV file.
+Removes vocals from any YouTube video and saves a karaoke WAV file.
 Uses **yt-dlp** to download, **Demucs** (htdemucs) for AI vocal separation, and **FFmpeg** for processing.
 Controlled entirely from your phone via a **Telegram bot**.
 

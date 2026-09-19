@@ -26,25 +26,25 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
   return (
     <div style={{
-      width: '310px',
+      width: '320px',
       height: '100%',
-      background: 'var(--bg-base)',
-      borderRight: '1px solid var(--border-subtle)',
+      background: 'var(--color-surface)',
+      borderLeft: '1px solid var(--color-border)',
       display: 'flex',
       flexDirection: 'column',
       userSelect: 'none',
       overflowY: 'auto',
-      zIndex: 20
+      zIndex: 30
     }}>
-      {/* Tabs: Properties vs Assets */}
+      {/* Tab Header */}
       <div style={{
         display: 'flex',
-        borderBottom: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--color-border)',
         padding: '0 16px',
         height: '46px',
         alignItems: 'center',
         gap: '20px',
-        background: '#ffffff'
+        background: 'var(--color-surface-elevated)'
       }}>
         <button
           onClick={() => setActiveTab('properties')}
@@ -54,8 +54,8 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             alignItems: 'center',
             fontSize: '13px',
             fontWeight: 600,
-            color: activeTab === 'properties' ? 'var(--accent-purple)' : 'var(--text-secondary)',
-            borderBottom: activeTab === 'properties' ? '2px solid var(--accent-purple)' : '2px solid transparent',
+            color: activeTab === 'properties' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+            borderBottom: activeTab === 'properties' ? '2px solid var(--color-primary)' : '2px solid transparent',
             padding: '0 4px',
             transition: 'all 0.15s'
           }}
@@ -70,8 +70,8 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             alignItems: 'center',
             fontSize: '13px',
             fontWeight: 500,
-            color: activeTab === 'assets' ? 'var(--accent-purple)' : 'var(--text-secondary)',
-            borderBottom: activeTab === 'assets' ? '2px solid var(--accent-purple)' : '2px solid transparent',
+            color: activeTab === 'assets' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+            borderBottom: activeTab === 'assets' ? '2px solid var(--color-primary)' : '2px solid transparent',
             padding: '0 4px',
             transition: 'all 0.15s'
           }}
@@ -92,7 +92,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
               fontSize: '11px',
               letterSpacing: '0.8px',
               textTransform: 'uppercase',
-              color: 'var(--text-muted)',
+              color: 'var(--color-text-secondary)',
               fontWeight: 700
             }}>
               <span>▴ Fade</span>
@@ -101,7 +101,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
             {/* Type & Bezier Inputs */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <div>
-                <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', display: 'block', marginBottom: '4px' }}>
                   Type
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -110,45 +110,20 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
                     onChange={(e) => onChange({ fadeType: e.target.value as any })}
                     style={{
                       width: '100%',
-                      background: '#ffffff',
-                      border: '1px solid var(--border-light)',
+                      background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-border)',
                       borderRadius: '6px',
                       padding: '7px 24px 7px 10px',
                       fontSize: '12px',
-                      color: 'var(--text-primary)',
+                      color: 'var(--color-text-primary)',
                       appearance: 'none',
                       outline: 'none',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                      cursor: 'pointer'
                     }}
                   >
-                    <option value="none">None</option>
                     <option value="linear">Linear</option>
-                    <option value="bezier">Bezier</option>
+                    <option value="logarithmic">Logarithmic</option>
                     <option value="exponential">Exponential</option>
-                  </select>
-                  <ChevronDown size={14} style={{ position: 'absolute', right: '8px', top: '9px', pointerEvents: 'none', color: 'var(--text-muted)' }} />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                  Bezier
-                </label>
-                <input
-                  type="text"
-                  value={inspector.bezierParams}
-                  onChange={(e) => onChange({ bezierParams: e.target.value })}
-                  style={{
-                    width: '100%',
-                    background: '#ffffff',
-                    border: '1px solid var(--border-light)',
-                    borderRadius: '6px',
-                    padding: '7px 10px',
-                    fontSize: '11px',
-                    fontFamily: 'var(--font-mono)',
-                    color: 'var(--text-primary)',
-                    outline: 'none',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
                   }}
                 />
               </div>
@@ -378,41 +353,41 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       ) : (
         /* ASSETS TAB */
         <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
             PROJECT ASSETS & STEM PACKS
           </div>
 
           <div style={{
-            background: '#ffffff',
-            border: '1px solid var(--border-light)',
+            background: 'var(--color-surface-elevated)',
+            border: '1px solid var(--color-border)',
             borderRadius: '8px',
             padding: '12px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
           }}>
-            <Layers size={20} color="var(--accent-purple)" />
+            <Layers size={20} color="var(--color-primary)" />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>Demucs 4-Stem Model</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>htdemucs • 80 MB AI Cache</div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Demucs 4-Stem Model</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>htdemucs • 80 MB AI Cache</div>
             </div>
           </div>
 
           <div style={{
-            background: '#ffffff',
-            border: '1px solid var(--border-light)',
+            background: 'var(--color-surface-elevated)',
+            border: '1px solid var(--color-border)',
             borderRadius: '8px',
             padding: '12px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
           }}>
             <FolderArchive size={20} color="#ea580c" />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>Master Audio Output</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>44.1kHz Stereo PCM WAV</div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Master Audio Output</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>44.1kHz Stereo PCM WAV</div>
             </div>
           </div>
         </div>

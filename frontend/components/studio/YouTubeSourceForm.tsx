@@ -114,26 +114,26 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       padding: '32px 20px',
-      background: 'radial-gradient(ellipse at 50% 10%, rgba(239, 68, 68, 0.04) 0%, #ffffff 70%)',
+      background: 'radial-gradient(ellipse at 50% 10%, rgba(239, 68, 68, 0.05) 0%, var(--color-bg-main) 70%)',
       overflowY: 'auto'
     }}>
       <div style={{
         width: '100%',
         maxWidth: '560px',
-        background: '#ffffff',
-        border: '1px solid var(--border-subtle)',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
         borderRadius: '16px',
-        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6)',
         overflow: 'hidden'
       }}>
         {/* Top Bar with Back Button */}
         <div style={{
           padding: '16px 24px',
-          borderBottom: '1px solid var(--border-subtle)',
+          borderBottom: '1px solid var(--color-border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#fafbfc'
+          background: 'var(--color-surface-elevated)'
         }}>
           <button
             onClick={onBack}
@@ -143,11 +143,11 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
               gap: '6px',
               fontSize: '13px',
               fontWeight: 600,
-              color: 'var(--text-secondary)',
+              color: 'var(--color-text-secondary)',
               transition: 'color 0.15s'
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--color-text-primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--color-text-secondary)')}
           >
             <ArrowLeft size={16} />
             <span>Back to sources</span>
@@ -160,7 +160,7 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
             fontSize: '12px',
             fontWeight: 600,
             color: '#ef4444',
-            background: '#fee2e2',
+            background: 'rgba(239, 68, 68, 0.15)',
             padding: '4px 10px',
             borderRadius: '9999px'
           }}>
@@ -169,48 +169,76 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
           </div>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Main URL Input */}
           <div>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
-              Import from YouTube
-            </h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-              Paste a link to isolate vocals or generate karaoke backing.
-            </p>
-          </div>
-
-          {/* YouTube URL Input */}
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
               YouTube URL <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <div style={{ position: 'relative' }}>
               <input
                 type="url"
-                required
-                placeholder="https://www.youtube.com/watch?v=..."
                 value={url}
-                onChange={e => setUrl(e.target.value)}
+                onChange={e => {
+                  setUrl(e.target.value);
+                  setErrorMsg('');
+                }}
+                placeholder="https://www.youtube.com/watch?v=..."
+                required
                 style={{
                   width: '100%',
-                  background: '#f8fafc',
-                  border: '1.5px solid var(--border-light)',
+                  padding: '12px 14px 12px 40px',
                   borderRadius: '10px',
-                  padding: '12px 14px',
-                  fontSize: '13.5px',
-                  color: 'var(--text-primary)',
+                  border: urlError ? '1px solid #ef4444' : '1px solid var(--color-border)',
+                  background: 'var(--color-surface-elevated)',
+                  fontSize: '13px',
+                  color: 'var(--color-text-primary)',
                   outline: 'none',
                   transition: 'border-color 0.15s'
                 }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#ef4444')}
-                onBlur={e => (e.currentTarget.style.borderColor = 'var(--border-light)')}
+                onFocus={e => (e.currentTarget.style.borderColor = 'var(--color-primary)')}
+                onBlur={e => (e.currentTarget.style.borderColor = urlError ? '#ef4444' : 'var(--color-border)')}
               />
-              {isFetchingMeta && (
+              <Video size={18} color="var(--color-text-secondary)" style={{ position: 'absolute', left: '14px', top: '13px' }} />
+              {urlError && (
                 <div style={{ position: 'absolute', right: '12px', top: '12px', color: '#ef4444' }}>
-                  <Loader2 size={18} className="animate-spin" />
+                  <AlertCircle size={18} />
                 </div>
               )}
+            </div>
+            {urlError && (
+              <span style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', display: 'block' }}>
+                {urlError}
+              </span>
+            )}
+          </div>
+
+          {/* Quick Preset Options */}
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+              Try sample track:
+            </label>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {PRESET_SAMPLES.map(sample => (
+                <button
+                  key={sample.url}
+                  type="button"
+                  onClick={() => handleSelectPreset(sample.url)}
+                  style={{
+                    fontSize: '12px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    background: url === sample.url ? 'rgba(185, 240, 59, 0.15)' : 'var(--color-surface-elevated)',
+                    border: url === sample.url ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+                    color: url === sample.url ? 'var(--color-primary)' : 'var(--color-text-primary)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  {sample.label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -220,8 +248,8 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
               display: 'flex',
               gap: '14px',
               padding: '12px',
-              background: '#f8fafc',
-              border: '1px solid var(--border-subtle)',
+              background: 'var(--color-surface-elevated)',
+              border: '1px solid var(--color-border)',
               borderRadius: '10px',
               alignItems: 'center'
             }}>
@@ -233,7 +261,7 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                   height: '62px',
                   objectFit: 'cover',
                   borderRadius: '6px',
-                  background: '#e2e8f0',
+                  background: 'var(--color-border)',
                   flexShrink: 0
                 }}
               />
@@ -247,7 +275,7 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                     width: '100%',
                     fontWeight: 600,
                     fontSize: '13px',
-                    color: 'var(--text-primary)',
+                    color: 'var(--color-text-primary)',
                     background: 'transparent',
                     border: 'none',
                     outline: 'none',
@@ -255,7 +283,7 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                     marginBottom: '4px'
                   }}
                 />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--color-text-secondary)' }}>
                   {duration && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Clock size={12} />
@@ -270,7 +298,7 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
 
           {/* Stem Mode Selector */}
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
               Separation Profile
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -280,22 +308,22 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                 style={{
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: stemMode === '2-stem' ? '2px solid var(--accent-purple)' : '1px solid var(--border-light)',
-                  background: stemMode === '2-stem' ? 'rgba(124, 58, 237, 0.05)' : '#ffffff',
+                  border: stemMode === '2-stem' ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+                  background: stemMode === '2-stem' ? 'rgba(185, 240, 59, 0.12)' : 'var(--color-surface-elevated)',
                   textAlign: 'left',
                   cursor: 'pointer',
                   transition: 'all 0.15s'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '2-stem' ? 'var(--accent-purple)' : 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '2-stem' ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>
                     2-Stem (Standard)
                   </span>
-                  <span style={{ fontSize: '10px', fontWeight: 700, background: '#ede9fe', color: 'var(--accent-purple)', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 700, background: 'rgba(185, 240, 59, 0.2)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: '4px' }}>
                     Fast
                   </span>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
                   Lead Vocals + Instrumental
                 </div>
               </button>
@@ -306,22 +334,22 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                 style={{
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: stemMode === '4-stem' ? '2px solid var(--accent-purple)' : '1px solid var(--border-light)',
-                  background: stemMode === '4-stem' ? 'rgba(124, 58, 237, 0.05)' : '#ffffff',
+                  border: stemMode === '4-stem' ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+                  background: stemMode === '4-stem' ? 'rgba(185, 240, 59, 0.12)' : 'var(--color-surface-elevated)',
                   textAlign: 'left',
                   cursor: 'pointer',
                   transition: 'all 0.15s'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '4-stem' ? 'var(--accent-purple)' : 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '4-stem' ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>
                     4-Stem (Pro)
                   </span>
-                  <span style={{ fontSize: '10px', fontWeight: 700, background: '#fef3c7', color: '#b45309', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 700, background: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', padding: '2px 6px', borderRadius: '4px' }}>
                     Full Studio
                   </span>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
                   Vocals, Drums, Bass, Other
                 </div>
               </button>
@@ -329,20 +357,20 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
           </div>
 
           {/* Collapsible Trim (Optional) */}
-          <div style={{ border: '1px solid var(--border-subtle)', borderRadius: '10px', overflow: 'hidden' }}>
+          <div style={{ border: '1px solid var(--color-border)', borderRadius: '10px', overflow: 'hidden' }}>
             <button
               type="button"
               onClick={() => setTrimOpen(!trimOpen)}
               style={{
                 width: '100%',
                 padding: '10px 14px',
-                background: '#fafbfc',
+                background: 'var(--color-surface-elevated)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 fontSize: '12px',
                 fontWeight: 600,
-                color: 'var(--text-secondary)',
+                color: 'var(--color-text-secondary)',
                 cursor: 'pointer'
               }}
             >
@@ -354,9 +382,9 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
             </button>
 
             {trimOpen && (
-              <div style={{ padding: '14px', background: '#ffffff', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', borderTop: '1px solid var(--border-subtle)' }}>
+              <div style={{ padding: '14px', background: 'var(--color-surface)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', borderTop: '1px solid var(--color-border)' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
                     Start (hh:mm:ss)
                   </label>
                   <input
@@ -366,19 +394,19 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                     onChange={e => setStartTime(e.target.value)}
                     style={{
                       width: '100%',
-                      background: '#f8fafc',
-                      border: '1px solid var(--border-light)',
+                      background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-border)',
                       borderRadius: '6px',
                       padding: '8px 10px',
                       fontSize: '12px',
                       fontFamily: 'var(--font-mono)',
-                      color: 'var(--text-primary)',
+                      color: 'var(--color-text-primary)',
                       outline: 'none'
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
                     End (hh:mm:ss)
                   </label>
                   <input
@@ -388,13 +416,13 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                     onChange={e => setEndTime(e.target.value)}
                     style={{
                       width: '100%',
-                      background: '#f8fafc',
-                      border: '1px solid var(--border-light)',
+                      background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-border)',
                       borderRadius: '6px',
                       padding: '8px 10px',
                       fontSize: '12px',
                       fontFamily: 'var(--font-mono)',
-                      color: 'var(--text-primary)',
+                      color: 'var(--color-text-primary)',
                       outline: 'none'
                     }}
                   />
@@ -410,18 +438,18 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
             gap: '10px',
             padding: '12px 14px',
             borderRadius: '10px',
-            background: '#f8fafc',
-            border: '1px solid var(--border-subtle)'
+            background: 'var(--color-surface-elevated)',
+            border: '1px solid var(--color-border)'
           }}>
             <input
               type="checkbox"
               id="legal-rights"
               checked={hasRightsAgreed}
               onChange={e => setHasRightsAgreed(e.target.checked)}
-              style={{ marginTop: '2.5px', accentColor: 'var(--accent-purple)', cursor: 'pointer' }}
+              style={{ marginTop: '2.5px', accentColor: 'var(--color-primary)', cursor: 'pointer' }}
             />
-            <label htmlFor="legal-rights" style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4, cursor: 'pointer' }}>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Rights Confirmation:</span> I confirm that I hold the copyright, license, or explicit permission to download, separate, and master this audio.
+            <label htmlFor="legal-rights" style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: 1.4, cursor: 'pointer' }}>
+              <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>Rights Confirmation:</span> I confirm that I hold the copyright, license, or explicit permission to download, separate, and master this audio.
             </label>
           </div>
 
@@ -433,10 +461,10 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
               gap: '8px',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: '#fee2e2',
-              color: '#dc2626',
+              background: 'rgba(239, 68, 68, 0.15)',
+              color: '#ef4444',
               fontSize: '12px',
-              border: '1px solid #fca5a5'
+              border: '1px solid rgba(239, 68, 68, 0.3)'
             }}>
               <AlertCircle size={15} flex-shrink={0} />
               <span>{errorMsg}</span>
@@ -449,9 +477,9 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
             disabled={isSubmitting || !url.trim() || !hasRightsAgreed}
             style={{
               background: hasRightsAgreed && url.trim()
-                ? 'linear-gradient(135deg, #ef4444, #dc2626)'
-                : '#cbd5e1',
-              color: '#ffffff',
+                ? 'linear-gradient(135deg, var(--color-primary), #90cb18)'
+                : 'var(--color-border)',
+              color: hasRightsAgreed && url.trim() ? '#0E0E0E' : 'var(--color-text-secondary)',
               padding: '12px',
               borderRadius: '10px',
               fontSize: '14px',
@@ -460,7 +488,7 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: hasRightsAgreed && url.trim() ? '0 4px 14px rgba(239, 68, 68, 0.3)' : 'none',
+              boxShadow: hasRightsAgreed && url.trim() ? '0 4px 14px rgba(185, 240, 59, 0.3)' : 'none',
               cursor: hasRightsAgreed && url.trim() ? 'pointer' : 'not-allowed',
               transition: 'all 0.2s'
             }}

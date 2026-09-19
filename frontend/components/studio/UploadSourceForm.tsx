@@ -120,26 +120,26 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       padding: '32px 20px',
-      background: 'radial-gradient(ellipse at 50% 10%, rgba(124, 58, 237, 0.05) 0%, #ffffff 70%)',
+      background: 'radial-gradient(ellipse at 50% 10%, rgba(185, 240, 59, 0.05) 0%, var(--color-bg-main) 70%)',
       overflowY: 'auto'
     }}>
       <div style={{
         width: '100%',
         maxWidth: '560px',
-        background: '#ffffff',
-        border: '1px solid var(--border-subtle)',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
         borderRadius: '16px',
-        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6)',
         overflow: 'hidden'
       }}>
         {/* Top Bar with Back Button */}
         <div style={{
           padding: '16px 24px',
-          borderBottom: '1px solid var(--border-subtle)',
+          borderBottom: '1px solid var(--color-border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#fafbfc'
+          background: 'var(--color-surface-elevated)'
         }}>
           <button
             onClick={onBack}
@@ -149,11 +149,11 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
               gap: '6px',
               fontSize: '13px',
               fontWeight: 600,
-              color: 'var(--text-secondary)',
+              color: 'var(--color-text-secondary)',
               transition: 'color 0.15s'
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--color-text-primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--color-text-secondary)')}
           >
             <ArrowLeft size={16} />
             <span>Back to sources</span>
@@ -165,8 +165,8 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
             gap: '6px',
             fontSize: '12px',
             fontWeight: 600,
-            color: 'var(--accent-purple)',
-            background: '#ede9fe',
+            color: 'var(--color-primary)',
+            background: 'rgba(185, 240, 59, 0.15)',
             padding: '4px 10px',
             borderRadius: '9999px'
           }}>
@@ -178,25 +178,13 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
-              Upload Audio Track
+            <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+              Upload Local Audio
             </h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-              Provide your local audio recording to extract stems with AI precision.
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+              Select an audio file from your device to isolate stems.
             </p>
           </div>
-
-          {/* Hidden File Input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".mp3,.wav,.flac,.m4a,.ogg,.aac,.wma"
-            style={{ display: 'none' }}
-            onChange={e => {
-              const f = e.target.files?.[0];
-              if (f) handleSelectFile(f);
-            }}
-          />
 
           {/* Dropzone */}
           <div
@@ -206,19 +194,19 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
             onClick={() => !file && fileInputRef.current?.click()}
             style={{
               border: isDragOver
-                ? '2px solid var(--accent-purple)'
+                ? '2px solid var(--color-primary)'
                 : file
                   ? '2px solid #22c55e'
-                  : '2px dashed var(--border-light)',
+                  : '2px dashed var(--color-border)',
               borderRadius: '12px',
               padding: file ? '16px 20px' : '36px 20px',
               textAlign: 'center',
               cursor: file ? 'default' : 'pointer',
               background: isDragOver
-                ? 'rgba(124, 58, 237, 0.04)'
+                ? 'rgba(185, 240, 59, 0.12)'
                 : file
-                  ? '#f0fdf4'
-                  : '#fafbfc',
+                  ? 'rgba(34, 197, 94, 0.1)'
+                  : 'var(--color-surface-elevated)',
               transition: 'all 0.2s ease',
               display: 'flex',
               flexDirection: file ? 'row' : 'column',
@@ -245,14 +233,14 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                   <div style={{
                     fontSize: '13.5px',
                     fontWeight: 600,
-                    color: 'var(--text-primary)',
+                    color: 'var(--color-text-primary)',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap'
                   }}>
                     {file.name}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                     {(file.size / (1024 * 1024)).toFixed(2)} MB • Ready for AI model
                   </div>
                 </div>
@@ -264,10 +252,10 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                     setErrorMsg(null);
                   }}
                   style={{
-                    color: 'var(--text-muted)',
+                    color: 'var(--color-text-secondary)',
                     padding: '6px',
                     borderRadius: '6px',
-                    background: '#e2e8f0'
+                    background: 'var(--color-border)'
                   }}
                   title="Remove file"
                 >
@@ -280,19 +268,19 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                   width: '56px',
                   height: '56px',
                   borderRadius: '50%',
-                  background: isDragOver ? 'rgba(124, 58, 237, 0.1)' : '#ede9fe',
+                  background: isDragOver ? 'rgba(185, 240, 59, 0.2)' : 'rgba(185, 240, 59, 0.12)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: '4px'
                 }}>
-                  <UploadCloud size={28} color="var(--accent-purple)" />
+                  <UploadCloud size={28} color="var(--color-primary)" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
                     {isDragOver ? 'Drop file to upload' : 'Click or drag & drop audio here'}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
                     Supports MP3, WAV, FLAC, M4A, OGG • Max {MAX_MB}MB
                   </div>
                 </div>
@@ -303,27 +291,35 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                     fileInputRef.current?.click();
                   }}
                   style={{
-                    background: '#ffffff',
-                    border: '1px solid var(--border-light)',
+                    marginTop: '6px',
+                    padding: '8px 16px',
                     borderRadius: '8px',
-                    padding: '6px 16px',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
                     fontSize: '12px',
                     fontWeight: 600,
-                    color: 'var(--text-primary)',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                    cursor: 'pointer',
-                    marginTop: '6px'
+                    color: 'var(--color-text-primary)'
                   }}
                 >
-                  Browse Computer
+                  Browse Files
                 </button>
               </>
             )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".mp3,.wav,.flac,.m4a,.ogg,.aac,.wma"
+              style={{ display: 'none' }}
+              onChange={e => {
+                const f = e.target.files?.[0];
+                if (f) handleSelectFile(f);
+              }}
+            />
           </div>
 
           {/* Track Title Input */}
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
               Project Title
             </label>
             <input
@@ -333,23 +329,23 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
               onChange={e => setTitle(e.target.value)}
               style={{
                 width: '100%',
-                background: '#f8fafc',
-                border: '1.5px solid var(--border-light)',
+                background: 'var(--color-surface-elevated)',
+                border: '1.5px solid var(--color-border)',
                 borderRadius: '10px',
                 padding: '10px 14px',
                 fontSize: '13.5px',
-                color: 'var(--text-primary)',
+                color: 'var(--color-text-primary)',
                 outline: 'none',
                 transition: 'border-color 0.15s'
               }}
-              onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent-purple)')}
-              onBlur={e => (e.currentTarget.style.borderColor = 'var(--border-light)')}
+              onFocus={e => (e.currentTarget.style.borderColor = 'var(--color-primary)')}
+              onBlur={e => (e.currentTarget.style.borderColor = 'var(--color-border)')}
             />
           </div>
 
           {/* Stem Mode Selector */}
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
               Separation Profile
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -359,22 +355,22 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                 style={{
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: stemMode === '2-stem' ? '2px solid var(--accent-purple)' : '1px solid var(--border-light)',
-                  background: stemMode === '2-stem' ? 'rgba(124, 58, 237, 0.05)' : '#ffffff',
+                  border: stemMode === '2-stem' ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+                  background: stemMode === '2-stem' ? 'rgba(185, 240, 59, 0.12)' : 'var(--color-surface-elevated)',
                   textAlign: 'left',
                   cursor: 'pointer',
                   transition: 'all 0.15s'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '2-stem' ? 'var(--accent-purple)' : 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '2-stem' ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>
                     2-Stem (Standard)
                   </span>
-                  <span style={{ fontSize: '10px', fontWeight: 700, background: '#ede9fe', color: 'var(--accent-purple)', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 700, background: 'rgba(185, 240, 59, 0.2)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: '4px' }}>
                     Fast
                   </span>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
                   Lead Vocals + Instrumental
                 </div>
               </button>
@@ -385,22 +381,22 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                 style={{
                   padding: '10px 14px',
                   borderRadius: '10px',
-                  border: stemMode === '4-stem' ? '2px solid var(--accent-purple)' : '1px solid var(--border-light)',
-                  background: stemMode === '4-stem' ? 'rgba(124, 58, 237, 0.05)' : '#ffffff',
+                  border: stemMode === '4-stem' ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+                  background: stemMode === '4-stem' ? 'rgba(185, 240, 59, 0.12)' : 'var(--color-surface-elevated)',
                   textAlign: 'left',
                   cursor: 'pointer',
                   transition: 'all 0.15s'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '4-stem' ? 'var(--accent-purple)' : 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: stemMode === '4-stem' ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>
                     4-Stem (Pro)
                   </span>
-                  <span style={{ fontSize: '10px', fontWeight: 700, background: '#fef3c7', color: '#b45309', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 700, background: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', padding: '2px 6px', borderRadius: '4px' }}>
                     Full Studio
                   </span>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
                   Vocals, Drums, Bass, Other
                 </div>
               </button>
@@ -408,20 +404,20 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
           </div>
 
           {/* Collapsible Trim (Optional) */}
-          <div style={{ border: '1px solid var(--border-subtle)', borderRadius: '10px', overflow: 'hidden' }}>
+          <div style={{ border: '1px solid var(--color-border)', borderRadius: '10px', overflow: 'hidden' }}>
             <button
               type="button"
               onClick={() => setTrimOpen(!trimOpen)}
               style={{
                 width: '100%',
                 padding: '10px 14px',
-                background: '#fafbfc',
+                background: 'var(--color-surface-elevated)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 fontSize: '12px',
                 fontWeight: 600,
-                color: 'var(--text-secondary)',
+                color: 'var(--color-text-secondary)',
                 cursor: 'pointer'
               }}
             >
@@ -433,9 +429,9 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
             </button>
 
             {trimOpen && (
-              <div style={{ padding: '14px', background: '#ffffff', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', borderTop: '1px solid var(--border-subtle)' }}>
+              <div style={{ padding: '14px', background: 'var(--color-surface)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', borderTop: '1px solid var(--color-border)' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
                     Start (hh:mm:ss)
                   </label>
                   <input
@@ -445,19 +441,19 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                     onChange={e => setStartTime(e.target.value)}
                     style={{
                       width: '100%',
-                      background: '#f8fafc',
-                      border: '1px solid var(--border-light)',
+                      background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-border)',
                       borderRadius: '6px',
                       padding: '8px 10px',
                       fontSize: '12px',
                       fontFamily: 'var(--font-mono)',
-                      color: 'var(--text-primary)',
+                      color: 'var(--color-text-primary)',
                       outline: 'none'
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
                     End (hh:mm:ss)
                   </label>
                   <input
@@ -467,13 +463,13 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
                     onChange={e => setEndTime(e.target.value)}
                     style={{
                       width: '100%',
-                      background: '#f8fafc',
-                      border: '1px solid var(--border-light)',
+                      background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-border)',
                       borderRadius: '6px',
                       padding: '8px 10px',
                       fontSize: '12px',
                       fontFamily: 'var(--font-mono)',
-                      color: 'var(--text-primary)',
+                      color: 'var(--color-text-primary)',
                       outline: 'none'
                     }}
                   />
@@ -490,10 +486,10 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
               gap: '8px',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: '#fee2e2',
-              color: '#dc2626',
+              background: 'rgba(239, 68, 68, 0.15)',
+              color: '#ef4444',
               fontSize: '12px',
-              border: '1px solid #fca5a5'
+              border: '1px solid rgba(239, 68, 68, 0.3)'
             }}>
               <AlertCircle size={15} flex-shrink={0} />
               <span>{errorMsg}</span>
@@ -506,9 +502,9 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
             disabled={isUploading || !file}
             style={{
               background: file
-                ? 'linear-gradient(135deg, #7c3aed, #9333ea)'
-                : '#cbd5e1',
-              color: '#ffffff',
+                ? 'linear-gradient(135deg, var(--color-primary), #90cb18)'
+                : 'var(--color-border)',
+              color: file ? '#0E0E0E' : 'var(--color-text-secondary)',
               padding: '12px',
               borderRadius: '10px',
               fontSize: '14px',
@@ -517,7 +513,7 @@ export const UploadSourceForm: React.FC<UploadSourceFormProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: file ? '0 4px 14px rgba(124, 58, 237, 0.3)' : 'none',
+              boxShadow: file ? '0 4px 14px rgba(185, 240, 59, 0.3)' : 'none',
               cursor: file ? 'pointer' : 'not-allowed',
               transition: 'all 0.2s'
             }}

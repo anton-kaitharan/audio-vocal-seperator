@@ -53,7 +53,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
     const totalBars = Math.floor(width / (barWidth + barGap));
     const seed = track.waveformSeed;
 
-    ctx.fillStyle = track.muted ? '#94a3b8' : track.color;
+    ctx.fillStyle = track.muted ? 'var(--color-text-secondary)' : track.color;
 
     for (let i = 0; i < totalBars; i++) {
       const t = i / totalBars;
@@ -76,7 +76,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
 
     // Volume envelope automation
     if (track.envelopeCurve) {
-      ctx.strokeStyle = '#9333ea';
+      ctx.strokeStyle = '#B9F03B';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, height * 0.65);
@@ -91,11 +91,11 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
         { x: width * 0.82, y: height * 0.22 }
       ];
       points.forEach(pt => {
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#1C1C1E';
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = '#7c3aed';
+        ctx.strokeStyle = '#B9F03B';
         ctx.lineWidth = 2;
         ctx.stroke();
       });
@@ -105,9 +105,9 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
   return (
     <div style={{
       height: '115px',
-      borderBottom: '1px solid var(--border-subtle)',
+      borderBottom: '1px solid var(--color-border)',
       display: 'flex',
-      background: '#ffffff',
+      background: 'var(--color-surface)',
       position: 'relative',
       overflow: 'visible'
     }}>
@@ -115,8 +115,8 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
       <div style={{
         width: '64px',
         height: '100%',
-        borderRight: '1px solid var(--border-subtle)',
-        background: '#f8fafc',
+        borderRight: '1px solid var(--color-border)',
+        background: 'var(--color-surface-elevated)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -129,7 +129,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             style={{
-              color: 'var(--text-secondary)',
+              color: 'var(--color-text-secondary)',
               padding: '4px',
               borderRadius: '4px',
               display: 'flex'
@@ -147,10 +147,10 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                 left: '28px',
                 top: '0',
                 width: '150px',
-                background: '#ffffff',
-                border: '1px solid var(--border-light)',
+                background: 'var(--color-surface-elevated)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '8px',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
                 padding: '4px',
                 zIndex: 50
               }}
@@ -159,110 +159,86 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                 onClick={() => { onDuplicate(track.id); setMenuOpen(false); }}
                 style={{
                   width: '100%',
+                  textAlign: 'left',
+                  padding: '6px 8px',
+                  fontSize: '12px',
+                  color: 'var(--color-text-primary)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '7px 10px',
-                  fontSize: '11px',
-                  color: 'var(--text-primary)',
-                  borderRadius: '4px',
-                  textAlign: 'left'
+                  gap: '6px',
+                  borderRadius: '4px'
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 <Copy size={13} />
-                <span>Duplicate track</span>
+                <span>Duplicate Lane</span>
               </button>
-
               <button
-                onClick={() => { onExportTrack(track.id); setMenuOpen(false); }}
+                onClick={() => { onDelete?.(track.id); setMenuOpen(false); }}
                 style={{
                   width: '100%',
+                  textAlign: 'left',
+                  padding: '6px 8px',
+                  fontSize: '12px',
+                  color: '#ef4444',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '7px 10px',
-                  fontSize: '11px',
-                  color: 'var(--text-primary)',
-                  borderRadius: '4px',
-                  textAlign: 'left'
+                  gap: '6px',
+                  borderRadius: '4px'
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                <Download size={13} />
-                <span>Export track</span>
-              </button>
-
-              <button
-                onClick={() => setMenuOpen(false)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '7px 10px',
-                  fontSize: '11px',
-                  color: 'var(--text-primary)',
-                  borderRadius: '4px',
-                  textAlign: 'left'
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#f1f5f9')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                <Scissors size={13} />
-                <span>Split channels</span>
-              </button>
-
-              <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '4px 0' }} />
-
-              <button
-                onClick={() => { onDeleteTrack(track.id); setMenuOpen(false); }}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '7px 10px',
-                  fontSize: '11px',
-                  color: '#dc2626',
-                  borderRadius: '4px',
-                  textAlign: 'left'
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#fee2e2')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 <Trash2 size={13} />
-                <span>Delete</span>
+                <span>Delete Track</span>
               </button>
             </div>
           )}
         </div>
 
-        {/* Mute Button */}
-        <button
-          onClick={() => onToggleMute(track.id)}
-          style={{
-            color: track.muted ? '#dc2626' : 'var(--text-secondary)',
-            padding: '4px',
-            borderRadius: '4px',
-            display: 'flex'
-          }}
-          title={track.muted ? 'Unmute Track' : 'Mute Track'}
-        >
-          {track.muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-        </button>
+        {/* Mute (M) & Solo (S) Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <button
+            onClick={() => onToggleMute(track.id)}
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              fontWeight: 800,
+              background: track.muted ? '#ef4444' : 'var(--color-surface)',
+              color: track.muted ? '#ffffff' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            title="Mute track"
+          >
+            M
+          </button>
+          <button
+            onClick={() => onToggleSolo?.(track.id)}
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              fontWeight: 800,
+              background: track.soloed ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: track.soloed ? '#0E0E0E' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            title="Solo track"
+          >
+            S
+          </button>
+        </div>
 
-        {/* Lock Button */}
+        {/* Lock State */}
         <button
-          onClick={() => onToggleLock(track.id)}
-          style={{
-            color: track.locked ? 'var(--accent-purple)' : 'var(--text-muted)',
-            padding: '4px',
-            borderRadius: '4px',
-            display: 'flex'
-          }}
+          onClick={() => onToggleLock?.(track.id)}
+          style={{ color: track.locked ? 'var(--color-primary)' : 'var(--color-text-secondary)' }}
           title={track.locked ? 'Unlock Track' : 'Lock Track'}
         >
           {track.locked ? <Lock size={14} /> : <Unlock size={14} />}
@@ -281,11 +257,11 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
           color: track.color,
           letterSpacing: '0.4px',
           textTransform: 'uppercase',
-          background: '#ffffff',
+          background: 'var(--color-surface-elevated)',
           padding: '2px 8px',
           borderRadius: '4px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-          border: '1px solid var(--border-subtle)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+          border: '1px solid var(--color-border)',
           pointerEvents: 'none',
           zIndex: 5
         }}>
@@ -320,10 +296,10 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                 width: '24px',
                 height: '24px',
                 borderRadius: '50%',
-                border: '2px solid var(--accent-purple)',
-                background: '#ffffff',
+                border: '2px solid var(--color-primary)',
+                background: 'var(--color-surface-elevated)',
                 overflow: 'hidden',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.5)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

@@ -35,8 +35,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(15, 23, 42, 0.45)',
-      backdropFilter: 'blur(6px)',
+      background: 'rgba(0, 0, 0, 0.75)',
+      backdropFilter: 'blur(8px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -46,10 +46,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
       <div style={{
         width: '100%',
         maxWidth: '460px',
-        background: '#ffffff',
-        border: '1px solid var(--border-light)',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
         borderRadius: '12px',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
         overflow: 'hidden'
       }}>
         {/* Header */}
@@ -58,22 +58,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '16px 20px',
-          borderBottom: '1px solid var(--border-subtle)',
-          background: '#f8fafc'
+          borderBottom: '1px solid var(--color-border)',
+          background: 'var(--color-surface-elevated)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Download size={18} color="var(--accent-purple)" />
-            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Export Audio Master</span>
+            <Download size={18} color="var(--color-primary)" />
+            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Export Audio Master</span>
           </div>
-          <button onClick={onClose} style={{ color: 'var(--text-muted)' }}>
+          <button onClick={onClose} style={{ color: 'var(--color-text-secondary)' }}>
             <X size={18} />
           </button>
         </div>
 
         {/* Body */}
-        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', background: '#ffffff' }}>
-          <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Choose export format for <strong style={{ color: 'var(--text-primary)' }}>{projectTitle}</strong>:
+        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'var(--color-surface)' }}>
+          <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+            Choose export format for <strong style={{ color: 'var(--color-text-primary)' }}>{projectTitle}</strong>:
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -86,19 +86,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                 justifyContent: 'space-between',
                 padding: '12px',
                 borderRadius: '8px',
-                background: format === 'wav' ? 'rgba(124, 58, 237, 0.08)' : '#f8fafc',
-                border: format === 'wav' ? '1px solid var(--accent-purple)' : '1px solid var(--border-light)',
+                background: format === 'wav' ? 'rgba(185, 240, 59, 0.12)' : 'var(--color-surface-elevated)',
+                border: format === 'wav' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
                 cursor: 'pointer'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <FileAudio size={20} color="var(--accent-purple)" />
+                <FileAudio size={20} color="var(--color-primary)" />
                 <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Master WAV (Lossless)</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>44.1kHz • 16-bit PCM • Broadcast Normalized</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Master WAV (Lossless)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>44.1kHz • 16-bit PCM • Broadcast Normalized</div>
                 </div>
               </div>
-              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontWeight: 600 }}>~45 MB</span>
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)', fontWeight: 600 }}>~45 MB</span>
             </div>
 
             {/* MP3 */}
@@ -110,19 +110,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                 justifyContent: 'space-between',
                 padding: '12px',
                 borderRadius: '8px',
-                background: format === 'mp3' ? 'rgba(124, 58, 237, 0.08)' : '#f8fafc',
-                border: format === 'mp3' ? '1px solid var(--accent-purple)' : '1px solid var(--border-light)',
+                background: format === 'mp3' ? 'rgba(185, 240, 59, 0.12)' : 'var(--color-surface-elevated)',
+                border: format === 'mp3' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
                 cursor: 'pointer'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <FileAudio size={20} color="#0284c7" />
                 <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>High Quality MP3</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>320 kbps CBR • Web & Mobile Friendly</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)' }}>High Quality MP3</div>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>320 kbps CBR • Web & Mobile Friendly</div>
                 </div>
               </div>
-              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontWeight: 600 }}>~7 MB</span>
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)', fontWeight: 600 }}>~7 MB</span>
             </div>
 
             {/* All Stems ZIP */}
@@ -134,36 +134,36 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                 justifyContent: 'space-between',
                 padding: '12px',
                 borderRadius: '8px',
-                background: format === 'zip' ? 'rgba(124, 58, 237, 0.08)' : '#f8fafc',
-                border: format === 'zip' ? '1px solid var(--accent-purple)' : '1px solid var(--border-light)',
+                background: format === 'zip' ? 'rgba(185, 240, 59, 0.12)' : 'var(--color-surface-elevated)',
+                border: format === 'zip' ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
                 cursor: 'pointer'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Archive size={20} color="#ea580c" />
                 <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Full Stems Bundle (.ZIP)</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Vocals, Backing, Drums, Bass WAVs</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)' }}>Full Stems Bundle (.ZIP)</div>
+                  <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>Vocals, Backing, Drums, Bass WAVs</div>
                 </div>
               </div>
-              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontWeight: 600 }}>~140 MB</span>
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)', fontWeight: 600 }}>~140 MB</span>
             </div>
           </div>
 
           <button
             onClick={handleDownload}
             style={{
-              background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
-              color: '#fff',
+              background: 'linear-gradient(135deg, var(--color-primary), #90cb18)',
+              color: '#0E0E0E',
               padding: '10px',
               borderRadius: '8px',
               fontSize: '13px',
-              fontWeight: 600,
+              fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: '0 2px 8px var(--accent-purple-glow)',
+              boxShadow: '0 2px 12px rgba(185, 240, 59, 0.3)',
               marginTop: '8px'
             }}
           >

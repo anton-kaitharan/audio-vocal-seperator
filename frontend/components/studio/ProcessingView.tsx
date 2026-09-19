@@ -158,16 +158,16 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       padding: '40px 20px',
-      background: 'radial-gradient(ellipse at 50% 20%, rgba(124, 58, 237, 0.06) 0%, #ffffff 70%)',
+      background: 'radial-gradient(ellipse at 50% 20%, rgba(185, 240, 59, 0.06) 0%, var(--color-bg-main) 70%)',
       overflowY: 'auto'
     }}>
       <div style={{
         width: '100%',
         maxWidth: '620px',
-        background: '#ffffff',
-        border: '1px solid var(--border-subtle)',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
         borderRadius: '20px',
-        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.07)',
+        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.6)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column'
@@ -175,17 +175,17 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
         {/* Header Bar */}
         <div style={{
           padding: '20px 24px',
-          borderBottom: '1px solid var(--border-subtle)',
+          borderBottom: '1px solid var(--color-border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#fafbfc'
+          background: 'var(--color-surface-elevated)'
         }}>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--accent-purple)', marginBottom: '2px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--color-primary)', marginBottom: '2px' }}>
               Separation Pipeline Active
             </div>
-            <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.3px' }}>
               {projectTitle}
             </h2>
           </div>
@@ -195,11 +195,11 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
             style={{
               padding: '6px 12px',
               borderRadius: '8px',
-              border: '1px solid var(--border-light)',
-              background: '#ffffff',
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-surface)',
               fontSize: '12px',
               fontWeight: 500,
-              color: 'var(--text-secondary)',
+              color: 'var(--color-text-secondary)',
               display: 'flex',
               alignItems: 'center',
               gap: '4px'
@@ -210,8 +210,40 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
           </button>
         </div>
 
-        {/* Stages Progression */}
-        <div style={{ padding: '30px 28px' }}>
+        {/* Main Content */}
+        <div style={{ padding: '28px 24px' }}>
+          {/* Main Progress Bar */}
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                Overall Separation Progress
+              </span>
+              <span style={{ fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--color-primary)' }}>
+                {Math.round(progressInfo.percent)}%
+              </span>
+            </div>
+
+            <div style={{
+              width: '100%',
+              height: '10px',
+              background: 'var(--color-surface-elevated)',
+              borderRadius: '9999px',
+              overflow: 'hidden',
+              padding: '2px',
+              border: '1px solid var(--color-border)'
+            }}>
+              <div style={{
+                height: '100%',
+                width: `${progressInfo.percent}%`,
+                background: 'linear-gradient(90deg, var(--color-primary), #90cb18)',
+                borderRadius: '9999px',
+                transition: 'width 0.4s ease',
+                boxShadow: '0 0 12px rgba(185, 240, 59, 0.4)'
+              }} />
+            </div>
+          </div>
+
+          {/* Stepper Pipeline */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {stages.map((stg, idx) => {
               const Icon = stg.icon;
@@ -222,41 +254,24 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
               return (
                 <div
                   key={stg.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '16px',
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: isCurrent
-                      ? `1.5px solid ${stg.color}`
-                      : isPast
-                        ? '1px solid rgba(16, 185, 129, 0.25)'
-                        : '1px solid var(--border-subtle)',
-                    background: isCurrent
-                      ? 'rgba(124, 58, 237, 0.03)'
-                      : isPast
-                        ? '#f0fdf4'
-                        : '#fafbfc',
-                    transition: 'all 0.25s ease'
-                  }}
+                  style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}
                 >
                   {/* Step Icon */}
                   <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '10px',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
                     background: isPast
                       ? '#10b981'
                       : isCurrent
-                        ? stg.color
-                        : '#e2e8f0',
+                        ? 'var(--color-primary)'
+                        : 'var(--color-surface-elevated)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#ffffff',
+                    color: isCurrent ? '#0E0E0E' : '#ffffff',
                     flexShrink: 0,
-                    boxShadow: isCurrent ? `0 0 16px ${stg.color}55` : 'none',
+                    boxShadow: isCurrent ? '0 0 16px rgba(185, 240, 59, 0.4)' : 'none',
                     transition: 'all 0.25s ease'
                   }}>
                     {isPast ? (
@@ -275,10 +290,10 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
                         fontSize: '14px',
                         fontWeight: 700,
                         color: isCurrent
-                          ? 'var(--text-primary)'
+                          ? 'var(--color-text-primary)'
                           : isPast
-                            ? '#065f46'
-                            : 'var(--text-muted)'
+                            ? '#10b981'
+                            : 'var(--color-text-secondary)'
                       }}>
                         {stg.title}
                       </span>
@@ -287,8 +302,8 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
                         <span style={{
                           fontSize: '11px',
                           fontWeight: 700,
-                          color: stg.color,
-                          background: '#ede9fe',
+                          color: 'var(--color-primary)',
+                          background: 'rgba(185, 240, 59, 0.15)',
                           padding: '2px 8px',
                           borderRadius: '9999px'
                         }}>
@@ -297,7 +312,7 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
                       )}
 
                       {isPast && (
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#059669' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#10b981' }}>
                           Completed
                         </span>
                       )}
@@ -305,7 +320,7 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
 
                     <p style={{
                       fontSize: '12px',
-                      color: isCurrent ? 'var(--text-secondary)' : 'var(--text-muted)',
+                      color: isCurrent ? 'var(--color-text-secondary)' : 'var(--color-text-secondary)',
                       lineHeight: 1.4
                     }}>
                       {stg.desc}
@@ -322,11 +337,11 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
             padding: '14px 18px',
             borderRadius: '12px',
             background: progressInfo.stage === 'failed'
-              ? '#fee2e2'
-              : '#f8fafc',
+              ? 'rgba(239, 68, 68, 0.15)'
+              : 'var(--color-surface-elevated)',
             border: progressInfo.stage === 'failed'
-              ? '1px solid #fca5a5'
-              : '1px solid var(--border-subtle)',
+              ? '1px solid rgba(239, 68, 68, 0.3)'
+              : '1px solid var(--color-border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -334,16 +349,16 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {progressInfo.stage === 'failed' ? (
-                <AlertCircle size={18} color="#dc2626" />
+                <AlertCircle size={18} color="#ef4444" />
               ) : isCompleted ? (
                 <CheckCircle2 size={18} color="#10b981" />
               ) : (
-                <Loader2 size={18} color="var(--accent-purple)" className="animate-spin" />
+                <Loader2 size={18} color="var(--color-primary)" className="animate-spin" />
               )}
               <span style={{
                 fontSize: '13px',
                 fontWeight: 600,
-                color: progressInfo.stage === 'failed' ? '#dc2626' : 'var(--text-primary)'
+                color: progressInfo.stage === 'failed' ? '#ef4444' : 'var(--color-text-primary)'
               }}>
                 {progressInfo.message}
               </span>
@@ -355,14 +370,14 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
               style={{
                 fontSize: '12px',
                 fontWeight: 600,
-                color: 'var(--accent-purple)',
+                color: 'var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
                 padding: '4px 8px',
                 borderRadius: '6px',
-                background: '#ffffff',
-                border: '1px solid var(--border-light)'
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)'
               }}
             >
               <Terminal size={13} />
