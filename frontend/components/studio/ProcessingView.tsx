@@ -219,7 +219,7 @@ export const ProcessingView: React.FC<ProcessingViewProps> = ({
                 Overall Separation Progress
               </span>
               <span style={{ fontSize: '14px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--color-primary)' }}>
-                {Math.round(progressInfo.percent)}%
+                {Math.round(progressInfo.percent ?? 0)}%
               </span>
             </div>
 

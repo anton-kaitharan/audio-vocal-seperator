@@ -26,6 +26,11 @@ interface YouTubeSourceFormProps {
   }) => void;
 }
 
+const PRESET_SAMPLES = [
+  { label: 'Synthwave Beat', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+  { label: 'Lo-Fi Chill Track', url: 'https://www.youtube.com/watch?v=5qap5aO4i9A' }
+];
+
 export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
   onBack,
   onSubmitJob
@@ -43,6 +48,11 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
   const [isFetchingMeta, setIsFetchingMeta] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleSelectPreset = (selectedUrl: string) => {
+    setUrl(selectedUrl);
+    setErrorMsg(null);
+  };
 
   // Extract YouTube ID on URL change
   useEffect(() => {
@@ -190,7 +200,7 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                   width: '100%',
                   padding: '12px 14px 12px 40px',
                   borderRadius: '10px',
-                  border: urlError ? '1px solid #ef4444' : '1px solid var(--color-border)',
+                  border: errorMsg ? '1px solid #ef4444' : '1px solid var(--color-border)',
                   background: 'var(--color-surface-elevated)',
                   fontSize: '13px',
                   color: 'var(--color-text-primary)',
@@ -198,18 +208,18 @@ export const YouTubeSourceForm: React.FC<YouTubeSourceFormProps> = ({
                   transition: 'border-color 0.15s'
                 }}
                 onFocus={e => (e.currentTarget.style.borderColor = 'var(--color-primary)')}
-                onBlur={e => (e.currentTarget.style.borderColor = urlError ? '#ef4444' : 'var(--color-border)')}
+                onBlur={e => (e.currentTarget.style.borderColor = errorMsg ? '#ef4444' : 'var(--color-border)')}
               />
               <Video size={18} color="var(--color-text-secondary)" style={{ position: 'absolute', left: '14px', top: '13px' }} />
-              {urlError && (
+              {errorMsg && (
                 <div style={{ position: 'absolute', right: '12px', top: '12px', color: '#ef4444' }}>
                   <AlertCircle size={18} />
                 </div>
               )}
             </div>
-            {urlError && (
+            {errorMsg && (
               <span style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', display: 'block' }}>
-                {urlError}
+                {errorMsg}
               </span>
             )}
           </div>

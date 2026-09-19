@@ -9,6 +9,7 @@ interface TrackLaneProps {
   duration: number;
   currentTime: number;
   onToggleMute: (id: string) => void;
+  onToggleSolo?: (id: string) => void;
   onToggleLock: (id: string) => void;
   onDuplicate: (id: string) => void;
   onExportTrack: (id: string) => void;
@@ -20,6 +21,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
   duration,
   currentTime,
   onToggleMute,
+  onToggleSolo,
   onToggleLock,
   onDuplicate,
   onExportTrack,
@@ -173,7 +175,7 @@ export const TrackLane: React.FC<TrackLaneProps> = ({
                 <span>Duplicate Lane</span>
               </button>
               <button
-                onClick={() => { onDelete?.(track.id); setMenuOpen(false); }}
+                onClick={() => { onDeleteTrack?.(track.id); setMenuOpen(false); }}
                 style={{
                   width: '100%',
                   textAlign: 'left',
