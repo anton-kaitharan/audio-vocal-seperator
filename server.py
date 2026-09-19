@@ -15,6 +15,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
 from dotenv import load_dotenv
+import db
+import auth
+from fastapi import Header
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 for env_name in [".env", "py.env"]:
@@ -55,6 +58,68 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- AUTH MODELS & ENDPOINTS ---
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+
+class LoginRequest(BaseModel):
+    email_or_username: str
+    password: str
+
+@app.post("/api/auth/register")
+def register_user(req: RegisterRequest):
+    if not req.username or len(req.username.strip()) < 3:
+        raise HTTPException(status_code=400, detail="Username must be at least 3 characters long.")
+    if not req.email or "@" not in req.email:
+        raise HTTPException(status_code=400, detail="Invalid email address.")
+    if not req.password or len(req.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long.")
+
+    hash_hex, salt = auth.hash_password(req.password)
+    try:
+        user = db.create_user(req.username, req.email, hash_hex, salt)
+        token = auth.generate_token(user["id"], user["username"], user["email"])
+        return {"status": "success", "token": token, "user": user}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/auth/login")
+def login_user(req: LoginRequest):
+    if not req.email_or_username or not req.password:
+        raise HTTPException(status_code=400, detail="Email/username and password are required.")
+
+    user_row = db.get_user_by_email_or_username(req.email_or_username)
+    if not user_row:
+        raise HTTPException(status_code=401, detail="Invalid credentials.")
+
+    if not auth.verify_password(req.password, user_row["password_hash"], user_row["salt"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials.")
+
+    user = {
+        "id": user_row["id"],
+        "username": user_row["username"],
+        "email": user_row["email"],
+        "created_at": user_row["created_at"]
+    }
+    token = auth.generate_token(user["id"], user["username"], user["email"])
+    return {"status": "success", "token": token, "user": user}
+
+@app.get("/api/auth/me")
+def get_current_user(authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header.")
+    token = authorization.replace("Bearer ", "").strip()
+    payload = auth.verify_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Token is expired or invalid.")
+    
+    user = db.get_user_by_id(payload["sub"])
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return {"status": "success", "user": user}
 
 watcher_process = None
 

@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Download, PlusCircle, Activity, Sliders, FolderOpen } from 'lucide-react';
+import { Download, PlusCircle, Activity, Sliders, FolderOpen, User, LogOut, ShieldCheck } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 interface MacTitlebarProps {
   projectTitle: string;
@@ -25,6 +26,9 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
   onToggleViewMode,
   onNewProject
 }) => {
+  const { user, isAuthenticated, openAuthModal, logout } = useAuth();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
   return (
     <header style={{
       height: '46px',
@@ -117,7 +121,7 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
         </span>
       </div>
 
-      {/* Right Actions */}
+      {/* Right Actions & User Auth Menu */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {onToggleViewMode && (
           <button
@@ -208,6 +212,120 @@ export const MacTitlebar: React.FC<MacTitlebarProps> = ({
           <Download size={14} />
           <span>Export Master</span>
         </button>
+
+        {/* User Auth Profile Badge */}
+        <div style={{ position: 'relative', marginLeft: '6px' }}>
+          {isAuthenticated && user ? (
+            <div>
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '4px 10px',
+                  borderRadius: '20px',
+                  background: 'var(--color-surface-elevated)',
+                  border: '1px solid var(--color-border)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--color-primary)')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--color-border)')}
+              >
+                <div
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: 'var(--color-primary)',
+                    color: '#0E0E0E',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {user.username.charAt(0).toUpperCase()}
+                </div>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                  {user.username}
+                </span>
+              </button>
+
+              {userMenuOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: '38px',
+                    width: '200px',
+                    background: 'var(--color-surface-elevated)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '10px',
+                    padding: '8px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                    zIndex: 100
+                  }}
+                >
+                  <div style={{ padding: '8px', borderBottom: '1px solid var(--color-border)', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                      {user.username}
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {user.email}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setUserMenuOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      borderRadius: '6px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#ef4444',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <LogOut size={14} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={openAuthModal}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontWeight: 600,
+                background: 'transparent',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                transition: 'all 0.15s'
+              }}
+            >
+              <User size={14} />
+              <span>Sign In</span>
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

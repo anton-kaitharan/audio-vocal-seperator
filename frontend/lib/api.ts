@@ -13,6 +13,44 @@ export async function fetchBackendStatus(): Promise<{ ok: boolean; data: Backend
   }
 }
 
+export async function registerApi(username: string, email: string, password: string) {
+  const res = await fetch(`${BACKEND_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, password }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Registration failed.');
+  }
+  return data;
+}
+
+export async function loginApi(email_or_username: string, password: string) {
+  const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email_or_username, password }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Login failed.');
+  }
+  return data;
+}
+
+export async function getMeApi(token: string) {
+  const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to authenticate token.');
+  }
+  return data;
+}
+
 export async function fetchYoutubeMetadata(url: string): Promise<{ title: string; duration: string; error?: string }> {
   try {
     const res = await fetch(`${BACKEND_URL}/api/metadata?url=${encodeURIComponent(url)}`);
