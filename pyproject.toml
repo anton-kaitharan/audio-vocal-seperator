@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "auravocal"
+version = "0.1.0"
+description = "AI vocal separation CLI & MCP server — powered by Demucs, yt-dlp, and FFmpeg"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Anton Kaitharan" },
+]
+keywords = ["vocal-separation", "karaoke", "demucs", "audio", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+]
+
+dependencies = [
+    "demucs>=4.0.1",
+    "yt-dlp>=2024.8.6",
+    "imageio-ffmpeg>=0.5.1",
+    "typer[all]>=0.12.0",
+    "mcp[cli]>=1.0.0",
+    "torch>=2.1.0",
+    "torchaudio>=2.1.0",
+    "numpy<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+]
+
+[project.scripts]
+auravocal = "auravocal.cli.__main__:app"
+auravocal-mcp = "auravocal.mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/auravocal"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

@@ -13,361 +13,800 @@ import {
   ArrowRight,
   Play,
   Pause,
-  Disc
+  Disc,
+  ChevronDown,
+  Volume2,
+  Music,
+  ShieldCheck,
+  Cpu,
+  Download,
+  Mic,
+  Headphones,
+  Radio
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
-  const [activeStemDemo, setActiveStemDemo] = useState<'master' | 'vocals' | 'karaoke' | 'drums'>('master');
-  const [isPlayingDemo, setIsPlayingDemo] = useState(false);
+  const { user, isAuthenticated, openAuthModal } = useAuth();
+
+  const [activeStem, setActiveStem] = useState<'master' | 'vocals' | 'backing' | 'drums' | 'bass'>('master');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeFaq, setActiveFaq] = useState<number | null>(0);
+
+  const stemDetails = {
+    master: { title: 'Full Master Mix', desc: 'Original stereo track before separation', color: '#1a1712', bg: '#eae6dc' },
+    vocals: { title: 'Isolated Acapella', desc: 'Crystal-clear lead & backing vocals only', color: '#FF2500', bg: '#fff1ee' },
+    backing: { title: 'Karaoke Instrumental', desc: 'Full backing track with vocals completely removed', color: '#4c63c7', bg: '#e6ecfb' },
+    drums: { title: 'Percussion & Drums', desc: 'Punchy kick, snare, and cymbals stem', color: '#ea580c', bg: '#fff7ed' },
+    bass: { title: 'Sub & Bassline', desc: 'Clean low-end frequency bass stem', color: '#0284c7', bg: '#f0f9ff' }
+  };
+
+  const faqs = [
+    {
+      q: 'How does AuraVocal extract vocals from audio or YouTube videos?',
+      a: 'AuraVocal uses Meta’s state-of-the-art Demucs v4 neural network architecture. When you upload an audio file or paste a YouTube URL, our GPU cluster downloads the stream, demixes the waveform into 4 discrete audio stems (Vocals, Drums, Bass, Other), normalizes the EBU R128 loudness, and packages it into lossless 44.1kHz 16-bit WAV files.'
+    },
+    {
+      q: 'Is there any loss in audio quality during stem isolation?',
+      a: 'No. Unlike basic phase-cancellation tools, our pipeline processes audio at full PCM 16-bit resolution. Exports retain full frequency spectrum coverage from 20Hz to 20kHz without muffled artifacts or metallic flange.'
+    },
+    {
+      q: 'Can I transpose the pitch or edit stems directly in my browser?',
+      a: 'Yes! AuraVocal features a built-in Browser DAW Workstation. You can pitch shift tracks in real-time (Hz scale), adjust volume sliders per stem, draw fade envelope curves, mute/solo lanes, and export stem bundles directly.'
+    },
+    {
+      q: 'Do I own the rights to the separated stems?',
+      a: 'Yes, you retain full rights to all processing outputs. You can freely use separated vocals and instrumental backing tracks for music production, DJ remixes, karaoke covers, or live sampling.'
+    }
+  ];
 
   return (
     <div style={{
-      width: '100vw',
+      width: '100%',
       minHeight: '100vh',
-      background: '#ffffff',
-      color: 'var(--text-primary)',
+      background: 'var(--bg-ref)',
+      color: 'var(--ink)',
+      fontFamily: 'var(--font-sans)',
+      WebkitFontSmoothing: 'antialiased',
       overflowX: 'hidden'
     }}>
-      {/* Top Navigation */}
-      <header style={{
-        height: '64px',
-        borderBottom: '1px solid var(--border-subtle)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 32px',
-        background: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(12px)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50
+      {/* ========== FLOATING GLASS NAVIGATION BAR ========== */}
+      <div style={{
+        position: 'fixed',
+        top: '16px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'calc(100% - 32px)',
+        maxWidth: '1240px',
+        zIndex: 100
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #7c3aed, #0284c7)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 8px var(--accent-purple-glow)'
-          }}>
-            <Disc size={18} color="#fff" />
+        <header style={{
+          height: '60px',
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.9)',
+          borderRadius: '9999px',
+          boxShadow: '0 12px 30px -10px rgba(38, 34, 28, 0.12), 0 2px 6px rgba(0,0,0,0.04)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px 0 24px'
+        }}>
+          {/* Logo & Brand */}
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'var(--orange)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(255, 37, 0, 0.35)'
+            }}>
+              <Disc size={18} color="#ffffff" />
+            </div>
+            <span style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '22px',
+              fontWeight: 700,
+              letterSpacing: '-0.3px',
+              color: 'var(--ink)'
+            }}>
+              Aura<span style={{ color: 'var(--orange)' }}>Vocal</span>
+            </span>
+          </Link>
+
+          {/* Navigation Links */}
+          <nav style={{ display: 'none', alignItems: 'center', gap: '28px' }}>
+            <a href="#features" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--prose-ref)', textDecoration: 'none', transition: 'color 0.15s' }}>Features</a>
+            <a href="#demo" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--prose-ref)', textDecoration: 'none', transition: 'color 0.15s' }}>Stem Demo</a>
+            <a href="#pricing" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--prose-ref)', textDecoration: 'none', transition: 'color 0.15s' }}>Pricing</a>
+            <a href="#faq" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--prose-ref)', textDecoration: 'none', transition: 'color 0.15s' }}>FAQ</a>
+          </nav>
+
+          {/* Action CTAs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Link href="/test" style={{
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--peri-ink)',
+              textDecoration: 'none',
+              padding: '8px 14px',
+              borderRadius: '9999px',
+              background: 'var(--peri-panel)',
+              border: '1px solid rgba(76, 99, 199, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <Activity size={14} />
+              <span>Sandbox</span>
+            </Link>
+
+            {isAuthenticated ? (
+              <Link href="/studio" style={{
+                background: 'var(--orange)',
+                color: '#ffffff',
+                textDecoration: 'none',
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '10px 20px',
+                borderRadius: '9999px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 8px 20px -4px rgba(255, 37, 0, 0.4)',
+                transition: 'transform 0.15s ease'
+              }}>
+                <span>Open Studio</span>
+                <ArrowRight size={14} />
+              </Link>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={openAuthModal}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'var(--ink)',
+                    cursor: 'pointer',
+                    padding: '8px 12px'
+                  }}
+                >
+                  Sign In
+                </button>
+                <Link href="/studio" style={{
+                  background: 'var(--orange)',
+                  color: '#ffffff',
+                  textDecoration: 'none',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  padding: '10px 20px',
+                  borderRadius: '9999px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 8px 20px -4px rgba(255, 37, 0, 0.4)'
+                }}>
+                  <span>Launch Studio</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
           </div>
-          <span style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.5px', color: '#0f172a' }}>
-            Aura<span style={{ color: 'var(--accent-purple)' }}>Vocal</span>
-          </span>
-        </div>
+        </header>
+      </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <Link href="/test" style={{
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#059669',
-            textDecoration: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            background: 'rgba(16, 185, 129, 0.08)'
-          }}>
-            <Activity size={14} />
-            <span>Test Sandbox (`/test`)</span>
-          </Link>
-
-          <Link href="/studio" style={{
-            background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
-            color: '#fff',
-            textDecoration: 'none',
-            fontSize: '13px',
-            fontWeight: 600,
-            padding: '8px 18px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            boxShadow: '0 2px 8px var(--accent-purple-glow)'
-          }}>
-            <span>Launch Studio</span>
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-      </header>
-
-      {/* Hero Section */}
+      {/* ========== HERO SECTION ========== */}
       <section style={{
-        maxWidth: '1100px',
+        maxWidth: '1240px',
         margin: '0 auto',
-        padding: '80px 20px 60px 20px',
-        textAlign: 'center',
+        padding: '150px 24px 80px 24px',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center'
+        alignItems: 'center',
+        textAlign: 'center'
       }}>
-        {/* Badge */}
+        {/* Top Badge */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '6px 14px',
-          borderRadius: '20px',
-          background: 'rgba(124, 58, 237, 0.08)',
-          border: '1px solid rgba(124, 58, 237, 0.25)',
-          color: 'var(--accent-purple)',
+          padding: '6px 16px',
+          borderRadius: '9999px',
+          background: 'var(--peri-panel)',
+          border: '1px solid var(--peri)',
+          color: 'var(--peri-ink)',
           fontSize: '12px',
           fontWeight: 600,
-          marginBottom: '24px'
+          marginBottom: '28px',
+          boxShadow: '0 4px 12px rgba(172, 196, 247, 0.25)'
         }}>
-          <Sparkles size={14} />
-          <span>Meta Demucs AI Separation Engine • 44.1kHz Studio Master</span>
+          <Sparkles size={14} color="var(--peri-ink)" />
+          <span>Meta Demucs v4 Neural Engine • 44.1kHz PCM Master</span>
         </div>
 
-        {/* Main Headline */}
+        {/* Display Heading in EB Garamond Serif */}
         <h1 style={{
-          fontSize: 'clamp(36px, 5vw, 64px)',
-          fontWeight: 800,
-          lineHeight: 1.15,
+          fontFamily: 'var(--font-serif)',
+          fontSize: 'clamp(42px, 6vw, 76px)',
+          fontWeight: 600,
+          lineHeight: 1.08,
           letterSpacing: '-1.5px',
-          maxWidth: '900px',
-          color: '#0f172a'
+          maxWidth: '960px',
+          color: 'var(--ink)'
         }}>
-          Split Vocals & Audio Stems <br />
-          <span style={{
-            background: 'linear-gradient(135deg, #7c3aed, #0284c7)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
-            From Any YouTube Track in Seconds
-          </span>
+          A vocal separator and stem studio <br />
+          that <span style={{ fontStyle: 'italic', color: 'var(--orange)' }}>producers actually need.</span>
         </h1>
 
+        {/* Subtitle */}
         <p style={{
-          fontSize: 'clamp(15px, 2vw, 18px)',
-          color: 'var(--text-secondary)',
+          fontSize: 'clamp(16px, 1.3vw, 20px)',
+          color: 'var(--body-dim-ref)',
           maxWidth: '680px',
-          marginTop: '20px',
-          lineHeight: 1.6
+          marginTop: '24px',
+          lineHeight: 1.6,
+          fontWeight: 400
         }}>
-          Transform any song into studio-quality karaoke acapella, backing tracks, drums, and bass stems.
-          Featuring our full browser-based audio workstation with pitch transposition and envelope automation.
+          Extract clean acapellas, karaoke backing tracks, isolated drums, and sub-bass stems from any audio file or YouTube video in seconds.
         </p>
 
-        {/* Hero Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '36px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {/* CTA Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '40px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/studio" style={{
-            background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
-            color: '#fff',
+            background: 'var(--orange)',
+            color: '#ffffff',
             textDecoration: 'none',
-            fontSize: '15px',
-            fontWeight: 600,
-            padding: '14px 28px',
-            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: 700,
+            padding: '16px 36px',
+            borderRadius: '9999px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 4px 16px var(--accent-purple-glow)'
+            gap: '10px',
+            boxShadow: '0 20px 40px -10px rgba(255, 37, 0, 0.45)',
+            transition: 'all 0.2s ease'
           }}>
             <Sliders size={18} />
-            <span>Open Studio Workstation</span>
+            <span>Launch Audio Studio</span>
+            <ArrowRight size={16} />
           </Link>
 
           <Link href="/test" style={{
-            background: '#ffffff',
-            color: 'var(--text-primary)',
+            background: 'var(--card-ref)',
+            color: 'var(--ink)',
             textDecoration: 'none',
             fontSize: '15px',
             fontWeight: 600,
-            padding: '14px 24px',
-            borderRadius: '10px',
-            border: '1px solid var(--border-light)',
+            padding: '16px 28px',
+            borderRadius: '9999px',
+            border: '1px solid var(--line-ref)',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+            boxShadow: '0 8px 24px -6px rgba(38, 34, 28, 0.12)'
           }}>
-            <Activity size={18} color="#059669" />
-            <span>Open Testing Sandbox</span>
+            <Activity size={18} color="var(--peri-ink)" />
+            <span>Try Test Sandbox</span>
           </Link>
         </div>
 
-        {/* Interactive Stem Audio Showcase */}
+        {/* Key Metrics / Highlights */}
         <div style={{
-          width: '100%',
-          maxWidth: '840px',
-          marginTop: '60px',
-          background: '#ffffff',
-          border: '1px solid var(--border-light)',
-          borderRadius: '16px',
-          padding: '24px',
-          boxShadow: '0 12px 30px rgba(0,0,0,0.06)',
-          textAlign: 'left'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '36px',
+          marginTop: '44px',
+          flexWrap: 'wrap',
+          fontSize: '13px',
+          color: 'var(--muted)',
+          fontWeight: 500
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={16} color="var(--orange)" />
+            <span>Under 20s GPU Demixing</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={16} color="var(--orange)" />
+            <span>44.1kHz Lossless WAV</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={16} color="var(--orange)" />
+            <span>Zero Phase Distortion</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== INTERACTIVE STEM AUDIO DEMO BENTO ========== */}
+      <section id="demo" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px 100px 24px' }}>
+        <div style={{
+          background: 'var(--card-ref)',
+          border: '1px solid var(--line-ref)',
+          borderRadius: '32px',
+          padding: '36px 36px',
+          boxShadow: 'var(--shadow-ref)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Live Stem Isolation Preview
+              <div style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                color: 'var(--orange)',
+                marginBottom: '4px'
+              }}>
+                Interactive Preview
               </div>
-              <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>
-                Queen — Bohemian Rhapsody (Stem Demixing)
-              </div>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', fontWeight: 600, color: 'var(--ink)' }}>
+                Listen to Isolated Stems
+              </h2>
             </div>
 
             <button
-              onClick={() => setIsPlayingDemo(!isPlayingDemo)}
+              onClick={() => setIsPlaying(!isPlaying)}
               style={{
-                background: 'var(--accent-purple)',
-                color: '#fff',
-                padding: '8px 16px',
-                borderRadius: '8px',
+                background: 'var(--ink)',
+                color: 'var(--bg-ref)',
+                padding: '10px 22px',
+                borderRadius: '9999px',
                 fontSize: '13px',
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                boxShadow: '0 2px 8px var(--accent-purple-glow)'
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(26, 23, 18, 0.2)'
               }}
             >
-              {isPlayingDemo ? <Pause size={16} /> : <Play size={16} />}
-              <span>{isPlayingDemo ? 'Pause Preview' : 'Play Preview'}</span>
+              {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+              <span>{isPlaying ? 'Pause Audio Preview' : 'Play Audio Preview'}</span>
             </button>
           </div>
 
-          {/* Stem Selectors */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-            {[
-              { id: 'master', label: 'Master Mix', color: 'var(--text-primary)', desc: 'Original Full Song' },
-              { id: 'vocals', label: 'Vocals Only', color: 'var(--stem-vocals)', desc: 'Clean Isolated Acapella' },
-              { id: 'karaoke', label: 'Instrumental', color: 'var(--stem-backing)', desc: 'Vocals Removed / Karaoke' },
-              { id: 'drums', label: 'Drums & Bass', color: 'var(--stem-drums)', desc: 'Rhythm Section Only' }
-            ].map(stem => (
-              <button
-                key={stem.id}
-                onClick={() => setActiveStemDemo(stem.id as any)}
-                style={{
-                  background: activeStemDemo === stem.id ? 'rgba(124, 58, 237, 0.08)' : '#f8fafc',
-                  border: activeStemDemo === stem.id ? '1px solid var(--accent-purple)' : '1px solid var(--border-light)',
-                  borderRadius: '10px',
-                  padding: '12px',
-                  textAlign: 'left',
-                  transition: 'all 0.15s'
-                }}
-              >
-                <div style={{ fontSize: '13px', fontWeight: 700, color: stem.color }}>{stem.label}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{stem.desc}</div>
-              </button>
-            ))}
+          {/* Stem Selector Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '28px' }}>
+            {(Object.keys(stemDetails) as Array<keyof typeof stemDetails>).map(key => {
+              const stem = stemDetails[key];
+              const isActive = activeStem === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveStem(key)}
+                  style={{
+                    background: isActive ? stem.bg : 'var(--bg-ref)',
+                    border: isActive ? `2px solid ${stem.color}` : '1px solid var(--line-ref)',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: isActive ? stem.color : 'var(--ink)' }}>
+                    {stem.title}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '4px', lineHeight: 1.4 }}>
+                    {stem.desc}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Waveform Visualizer Display */}
+          <div style={{
+            background: 'var(--ink-2)',
+            borderRadius: '20px',
+            padding: '24px',
+            color: '#ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--orange)', animation: isPlaying ? 'pulse 1s infinite' : 'none' }} />
+                <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#a1a1aa' }}>
+                  ACTIVE STEM: <strong style={{ color: '#ffffff' }}>{stemDetails[activeStem].title.toUpperCase()}</strong>
+                </span>
+              </div>
+              <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: '#71717a' }}>
+                00:42 / 03:15 • 44.1kHz WAV
+              </span>
+            </div>
+
+            {/* Simulated Animated Waveform Bars */}
+            <div style={{ height: '64px', display: 'flex', alignItems: 'center', gap: '4px', padding: '0 8px' }}>
+              {Array.from({ length: 50 }).map((_, i) => {
+                const height = Math.sin(i * 0.4) * 20 + 28 + (isPlaying ? (i % 3) * 6 : 0);
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      flex: 1,
+                      height: `${height}px`,
+                      background: i < 20 ? stemDetails[activeStem].color : 'rgba(255,255,255,0.15)',
+                      borderRadius: '2px',
+                      transition: 'height 0.15s ease'
+                    }}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Audio Controls Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: '#a1a1aa' }}>
+                <Volume2 size={16} />
+                <span>Stem Gain: <strong>0.0 dB</strong></span>
+              </div>
+              <div style={{ fontSize: '11px', color: '#71717a' }}>
+                Processed by Meta Demucs AI Model
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Feature Grid */}
-      <section style={{ maxWidth: '1100px', margin: '0 auto', padding: '60px 20px', borderTop: '1px solid var(--border-subtle)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)' }}>Engineered for Producers & Karaoke Creators</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '6px' }}>
-            Built on top of cutting-edge neural audio demixing algorithms.
-          </p>
+      {/* ========== BENTO GRID FEATURE HIGHLIGHTS ========== */}
+      <section id="features" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px 100px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--orange)', marginBottom: '8px' }}>
+            Built for Audio Excellence
+          </div>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 600, color: 'var(--ink)' }}>
+            Everything you need for stem separation.
+          </h2>
+        </div>
+
+        {/* Bento Grid Layout */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '20px' }}>
+          
+          {/* Card 1 (Large 8 Cols): 4-Stem Separation */}
+          <div style={{
+            gridColumn: 'span 8',
+            background: 'var(--card-ref)',
+            border: '1px solid var(--line-ref)',
+            borderRadius: '28px',
+            padding: '36px',
+            boxShadow: 'var(--shadow-ref)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'var(--peri-panel)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <Layers size={22} color="var(--peri-ink)" />
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', fontWeight: 600, color: 'var(--ink)', marginBottom: '10px' }}>
+                4-Stem AI Neural Demixing
+              </h3>
+              <p style={{ fontSize: '15px', color: 'var(--body-dim-ref)', lineHeight: 1.6, maxWidth: '540px' }}>
+                Isolate lead vocals, drums, bass, and instrumental accompaniment with state-of-the-art Meta Demucs v4 deep learning models.
+              </p>
+            </div>
+
+            <div style={{ marginTop: '28px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '9999px', background: 'var(--bg-ref)', color: 'var(--ink)' }}>Vocals (Acapella)</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '9999px', background: 'var(--bg-ref)', color: 'var(--ink)' }}>Drums & Percussion</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '9999px', background: 'var(--bg-ref)', color: 'var(--ink)' }}>Sub-Bass & Synths</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '9999px', background: 'var(--bg-ref)', color: 'var(--ink)' }}>Instrumental Backing</span>
+            </div>
+          </div>
+
+          {/* Card 2 (Small 4 Cols): Studio PCM Master */}
+          <div style={{
+            gridColumn: 'span 4',
+            background: 'var(--peri-panel)',
+            border: '1px solid var(--peri)',
+            borderRadius: '28px',
+            padding: '36px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <FileAudio size={22} color="var(--peri-ink)" />
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontWeight: 600, color: 'var(--ink)', marginBottom: '10px' }}>
+                44.1kHz PCM WAV
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--prose-ref)', lineHeight: 1.6 }}>
+                Export studio-grade uncompressed audio files ready for direct import into Ableton, Logic, FL Studio, or Pro Tools.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3 (Small 4 Cols): GPU Acceleration */}
+          <div style={{
+            gridColumn: 'span 4',
+            background: 'var(--card-ref)',
+            border: '1px solid var(--line-ref)',
+            borderRadius: '28px',
+            padding: '36px',
+            boxShadow: 'var(--shadow-ref)'
+          }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fff1ee', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+              <Zap size={22} color="var(--orange)" />
+            </div>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontWeight: 600, color: 'var(--ink)', marginBottom: '10px' }}>
+              Under 20s Processing
+            </h3>
+            <p style={{ fontSize: '14px', color: 'var(--body-dim-ref)', lineHeight: 1.6 }}>
+              Powered by CUDA GPU clusters for lightning-fast demixing with zero queue bottlenecking.
+            </p>
+          </div>
+
+          {/* Card 4 (Large 8 Cols): Full Browser DAW Workstation */}
+          <div style={{
+            gridColumn: 'span 8',
+            background: 'var(--card-ref)',
+            border: '1px solid var(--line-ref)',
+            borderRadius: '28px',
+            padding: '36px',
+            boxShadow: 'var(--shadow-ref)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#f0f9ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <Sliders size={22} color="#0284c7" />
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', fontWeight: 600, color: 'var(--ink)', marginBottom: '10px' }}>
+                Full Browser DAW Workstation
+              </h3>
+              <p style={{ fontSize: '15px', color: 'var(--body-dim-ref)', lineHeight: 1.6, maxWidth: '540px' }}>
+                Pitch shift tracks in real-time, fine-tune fade-in/out bezier automation curves, mute/solo individual lanes, and master output loudness.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========== PRICING TIERS SECTION ========== */}
+      <section id="pricing" style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px 100px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--orange)', marginBottom: '8px' }}>
+            Transparent Plans
+          </div>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 600, color: 'var(--ink)' }}>
+            Simple pricing for creators & studios.
+          </h2>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-          <div style={{ background: '#f8fafc', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '24px' }}>
-            <Layers size={28} color="var(--accent-purple)" />
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginTop: '14px', color: 'var(--text-primary)' }}>4-Stem Neural Separation</h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: 1.5 }}>
-              Separate any audio into Vocals, Drums, Bass, and Other accompaniment with minimal artifacting.
-            </p>
-          </div>
-
-          <div style={{ background: '#f8fafc', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '24px' }}>
-            <FileAudio size={28} color="#0284c7" />
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginTop: '14px', color: 'var(--text-primary)' }}>Studio Lossless Master</h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: 1.5 }}>
-              Automatic silence stripping, EBU R128 loudness normalization, and crystal clear 44.1kHz 16-bit PCM WAV.
-            </p>
-          </div>
-
-          <div style={{ background: '#f8fafc', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '24px' }}>
-            <Zap size={28} color="#ea580c" />
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginTop: '14px', color: 'var(--text-primary)' }}>GPU Accelerated Inference</h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: 1.5 }}>
-              Leverages local CUDA cores or serverless GPU workers (Modal/RunPod) to demix songs in under 20 seconds.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing / SaaS Monetization Tiers */}
-      <section style={{ maxWidth: '1100px', margin: '0 auto', padding: '60px 20px 100px 20px', borderTop: '1px solid var(--border-subtle)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)' }}>Simple, Transparent SaaS Pricing</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '6px' }}>
-            Start for free, or upgrade for unlimited high-priority GPU separations.
-          </p>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+          
           {/* Free Tier */}
-          <div style={{ background: '#ffffff', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '28px', display: 'flex', flexDirection: 'column', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>Free Starter</div>
-            <div style={{ fontSize: '28px', fontWeight: 800, marginTop: '8px', color: 'var(--text-primary)' }}>$0 <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>/ forever</span></div>
-            <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: 'var(--text-secondary)', flex: 1 }}>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> 2 songs per day</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> Standard 2-stem vocal remover</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> MP3 320kbps export</li>
-            </ul>
-            <Link href="/studio" style={{ marginTop: '24px', textAlign: 'center', background: '#f8fafc', border: '1px solid var(--border-light)', color: 'var(--text-primary)', padding: '10px', borderRadius: '8px', textDecoration: 'none', fontSize: '13px', fontWeight: 600 }}>
-              Get Started Free
+          <div style={{
+            background: 'var(--card-ref)',
+            border: '1px solid var(--line-ref)',
+            borderRadius: '28px',
+            padding: '36px',
+            boxShadow: 'var(--shadow-ref)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink)' }}>Starter</div>
+              <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px' }}>For casual listening & quick vocal checks</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '42px', fontWeight: 600, marginTop: '20px', color: 'var(--ink)' }}>
+                $0 <span style={{ fontSize: '14px', fontFamily: 'var(--font-sans)', color: 'var(--muted)' }}>/ forever</span>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: 'var(--prose-ref)' }}>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> 2 separations per day</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> Standard 2-stem vocal remover</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> MP3 320kbps export format</li>
+              </ul>
+            </div>
+            <Link href="/studio" style={{
+              marginTop: '32px',
+              textAlign: 'center',
+              background: 'var(--bg-ref)',
+              color: 'var(--ink)',
+              padding: '14px',
+              borderRadius: '9999px',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 600,
+              border: '1px solid var(--line-ref)'
+            }}>
+              Start Free Studio Session
             </Link>
           </div>
 
-          {/* Pro Tier */}
-          <div style={{ background: '#ffffff', border: '2px solid var(--accent-purple)', borderRadius: '12px', padding: '28px', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 8px 24px rgba(124, 58, 237, 0.12)' }}>
-            <div style={{ position: 'absolute', top: '-11px', right: '20px', background: 'var(--accent-purple)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', textTransform: 'uppercase' }}>Most Popular</div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--accent-purple)' }}>Pro Producer</div>
-            <div style={{ fontSize: '28px', fontWeight: 800, marginTop: '8px', color: 'var(--text-primary)' }}>$14.99 <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>/ month</span></div>
-            <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: 'var(--text-primary)', flex: 1 }}>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> Unlimited separations</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> 4-stem demixing (Vocals, Drums, Bass)</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> Studio lossless 44.1kHz WAV export</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> Priority GPU queue (under 20s)</li>
-            </ul>
-            <Link href="/studio" style={{ marginTop: '24px', textAlign: 'center', background: 'var(--accent-purple)', color: '#fff', padding: '10px', borderRadius: '8px', textDecoration: 'none', fontSize: '13px', fontWeight: 600, boxShadow: '0 2px 10px var(--accent-purple-glow)' }}>
-              Upgrade to Pro
+          {/* Pro Tier (Featured Orange Highlight) */}
+          <div style={{
+            background: 'linear-gradient(180deg, #ffffff, #fff7f2)',
+            border: '2px solid var(--orange)',
+            borderRadius: '28px',
+            padding: '36px',
+            boxShadow: '0 30px 60px -20px rgba(255, 37, 0, 0.25)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative'
+          }}>
+            <div style={{ position: 'absolute', top: '-13px', right: '28px', background: 'var(--orange)', color: '#ffffff', fontSize: '11px', fontWeight: 700, padding: '4px 12px', borderRadius: '9999px', textTransform: 'uppercase' }}>
+              Most Popular
+            </div>
+            <div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--orange)' }}>Pro Producer</div>
+              <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px' }}>For active music producers & DJs</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '42px', fontWeight: 600, marginTop: '20px', color: 'var(--ink)' }}>
+                $14.99 <span style={{ fontSize: '14px', fontFamily: 'var(--font-sans)', color: 'var(--muted)' }}>/ month</span>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: 'var(--ink)' }}>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> Unlimited stem separations</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> 4-stem demixing (Vocals, Drums, Bass)</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> Lossless 44.1kHz 16-bit WAV export</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> Priority CUDA GPU queue (under 20s)</li>
+              </ul>
+            </div>
+            <Link href="/studio" style={{
+              marginTop: '32px',
+              textAlign: 'center',
+              background: 'var(--orange)',
+              color: '#ffffff',
+              padding: '14px',
+              borderRadius: '9999px',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 700,
+              boxShadow: '0 8px 20px -4px rgba(255, 37, 0, 0.4)'
+            }}>
+              Upgrade to Pro Studio
             </Link>
           </div>
 
           {/* Studio Tier */}
-          <div style={{ background: '#ffffff', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '28px', display: 'flex', flexDirection: 'column', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>Studio Label</div>
-            <div style={{ fontSize: '28px', fontWeight: 800, marginTop: '8px', color: 'var(--text-primary)' }}>$49.00 <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>/ month</span></div>
-            <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: 'var(--text-secondary)', flex: 1 }}>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> Batch folder processing</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> API access & Webhook triggers</li>
-              <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={15} color="#059669" /> Commercial licensing rights</li>
-            </ul>
-            <Link href="/studio" style={{ marginTop: '24px', textAlign: 'center', background: '#f8fafc', border: '1px solid var(--border-light)', color: 'var(--text-primary)', padding: '10px', borderRadius: '8px', textDecoration: 'none', fontSize: '13px', fontWeight: 600 }}>
+          <div style={{
+            background: 'var(--card-ref)',
+            border: '1px solid var(--line-ref)',
+            borderRadius: '28px',
+            padding: '36px',
+            boxShadow: 'var(--shadow-ref)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink)' }}>Studio Label</div>
+              <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px' }}>For record labels & commercial API integration</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '42px', fontWeight: 600, marginTop: '20px', color: 'var(--ink)' }}>
+                $49.00 <span style={{ fontSize: '14px', fontFamily: 'var(--font-sans)', color: 'var(--muted)' }}>/ month</span>
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: 'var(--prose-ref)' }}>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> Batch folder processing</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> REST API & Webhook access</li>
+                <li style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><CheckCircle2 size={16} color="var(--orange)" /> Commercial licensing rights</li>
+              </ul>
+            </div>
+            <Link href="/studio" style={{
+              marginTop: '32px',
+              textAlign: 'center',
+              background: 'var(--bg-ref)',
+              color: 'var(--ink)',
+              padding: '14px',
+              borderRadius: '9999px',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 600,
+              border: '1px solid var(--line-ref)'
+            }}>
               Contact Sales
             </Link>
           </div>
+
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ========== FAQ ACCORDION SECTION ========== */}
+      <section id="faq" style={{ maxWidth: '840px', margin: '0 auto', padding: '0 24px 100px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '44px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--orange)', marginBottom: '8px' }}>
+            Got Questions?
+          </div>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 600, color: 'var(--ink)' }}>
+            Frequently Asked Questions
+          </h2>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {faqs.map((faq, idx) => {
+            const isOpen = activeFaq === idx;
+            return (
+              <div
+                key={idx}
+                style={{
+                  background: 'var(--card-ref)',
+                  border: '1px solid var(--line-ref)',
+                  borderRadius: '18px',
+                  overflow: 'hidden',
+                  boxShadow: '0 4px 16px -6px rgba(30, 28, 24, 0.08)'
+                }}
+              >
+                <button
+                  onClick={() => setActiveFaq(isOpen ? null : idx)}
+                  style={{
+                    width: '100%',
+                    padding: '20px 24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'transparent',
+                    border: 'none',
+                    textAlign: 'left',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: 'var(--ink)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span>{faq.q}</span>
+                  <ChevronDown
+                    size={18}
+                    color="var(--muted)"
+                    style={{
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  />
+                </button>
+                {isOpen && (
+                  <div style={{ padding: '0 24px 20px 24px', fontSize: '14px', color: 'var(--body-dim-ref)', lineHeight: 1.65 }}>
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ========== FOOTER ========== */}
       <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        padding: '30px 20px',
-        textAlign: 'center',
-        fontSize: '12px',
-        color: 'var(--text-muted)',
-        background: '#f8fafc'
+        background: 'var(--ink-2)',
+        color: '#ffffff',
+        padding: '60px 24px 40px 24px',
+        borderTop: '1px solid rgba(255,255,255,0.1)'
       }}>
-        <div>AuraVocal Studio • Next.js 15 & Meta Demucs AI Audio Demixing</div>
-        <div style={{ marginTop: '8px' }}>
-          <Link href="/studio" style={{ color: 'var(--text-secondary)', textDecoration: 'none', margin: '0 10px' }}>Studio</Link>
-          <Link href="/test" style={{ color: '#059669', textDecoration: 'none', margin: '0 10px' }}>Test Sandbox</Link>
+        <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Disc size={18} color="#ffffff" />
+              </div>
+              <span style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontWeight: 700, color: '#ffffff' }}>
+                Aura<span style={{ color: 'var(--orange)' }}>Vocal</span>
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '24px', fontSize: '13px', color: '#a1a1aa' }}>
+              <Link href="/studio" style={{ color: '#ffffff', textDecoration: 'none' }}>Studio Workstation</Link>
+              <Link href="/test" style={{ color: '#ffffff', textDecoration: 'none' }}>Test Sandbox</Link>
+              <a href="#features" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Features</a>
+              <a href="#pricing" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Pricing</a>
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', color: '#71717a', flexWrap: 'wrap', gap: '12px' }}>
+            <div>© 2026 AuraVocal Studio • Powered by Meta Demucs AI Neural Audio Demixing</div>
+            <div>Designed with Warm Editorial Typography & Vibrant Orange Aesthetics</div>
+          </div>
         </div>
       </footer>
     </div>

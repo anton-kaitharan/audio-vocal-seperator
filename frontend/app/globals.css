@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   --color-primary: #B9F03B;
@@ -8,6 +8,27 @@
   --color-border: #3A3A3C;
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #8E8E93;
+
+  /* Reference Design System Theme Tokens */
+  --orange: #FF2500;
+  --orange-rgb: 255, 37, 0;
+  --peri: #aec4f7;
+  --peri-ink: #4c63c7;
+  --peri-panel: #e6ecfb;
+  --ink: #1a1712;
+  --ink-2: #14141a;
+  --muted: #7c766c;
+  --bg-ref: #f4f2ec;
+  --bg-2-ref: #eae6dc;
+  --card-ref: #ffffff;
+  --line-ref: rgba(26, 23, 18, 0.1);
+  --prose-ref: rgba(26, 23, 18, 0.82);
+  --body-dim-ref: rgba(20, 20, 22, 0.62);
+  --shadow-ref: 0 26px 60px -28px rgba(38, 34, 28, 0.34);
+
+  --font-serif: 'EB Garamond', Georgia, serif;
+  --font-sans: 'Inter', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
   --bg-darkest: var(--color-bg-main);
   --bg-base: var(--color-bg-main);
@@ -32,9 +53,6 @@
   --accent-purple: var(--color-primary);
   --accent-purple-glow: rgba(185, 240, 59, 0.25);
   --playhead-red: #ef4444;
-
-  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
 }
 
 * {
